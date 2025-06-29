@@ -8,6 +8,8 @@ const logger = new Logger("Config:Env");
 // Schema for environment variables
 const envSchema = z.object({
   REDIS_URL: z.string(),
+  GOOGLE_API_KEY: z.string(),
+  GOOGLE_CLIENT_ID: z.string(), // used for google auth
 });
 
 // Function to validate environment variables
@@ -16,6 +18,8 @@ const validateEnv = () => {
     logger.info("Validating environment variables");
     const env = {
       REDIS_URL: process.env.REDIS_URL,
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     };
     const parsed = envSchema.parse(env);
     logger.info("Environment variables validated successfully");

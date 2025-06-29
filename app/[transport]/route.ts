@@ -1,33 +1,33 @@
 import { createMcpHandler } from "@vercel/mcp-adapter";
 import { z } from "zod";
+import { env } from "@/app/config/env";
+import { Logger } from "@/app/utils/logger";
+
+export const maxDuration = 800;
+
+const logger = new Logger("MCP:Experiment");
 
 const handler = createMcpHandler(
-  async (server) => {
-    server.tool(
-      "echo",
-      "description",
-      {
-        message: z.string(),
-      },
-      async ({ message }) => ({
-        content: [{ type: "text", text: `Tool echo: ${message}` }],
-      })
-    );
+  server => {
+    logger.info("Initializing MCP handler");
+    //TODO: Resources definition
+    //TODO: TOOLS DEFINITION
+    //
   },
-  {
-    capabilities: {
-      tools: {
-        echo: {
-          description: "Echo a message",
-        },
-      },
-    },
-  },
-  {
-    basePath: "",
-    verboseLogs: true,
-    maxDuration: 60,
-  }
+  // pre setup from when redis is needed.
+  // {
+  //   redisUrl: env.REDIS_URL,
+  //   basePath: "",
+  //   verboseLogs: true,
+  //   maxDuration: 60,
+  // }
 );
+
+logger.info("MCP experiment handler created successfully", {
+  redisUrl: !!env.REDIS_URL,
+  verboseLogs: true,
+  maxDuration: 60,
+});
+
 
 export { handler as GET, handler as POST, handler as DELETE };
