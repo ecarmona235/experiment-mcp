@@ -8,29 +8,20 @@ export const maxDuration = 800;
 
 const logger = new Logger("MCP:Experiment");
 
-const handler = createMcpHandler(
-  server => {
-    logger.info("Initializing MCP handler");
+const handler = createMcpHandler(server => {
+  logger.info("Initializing MCP handler");
 
-    // Register auth resource
-    const authResource = createAuthResource();
-    server.resource(authResource.name, authResource.uri, authResource.read);
-    logger.info("Auth resource registered", {
-      name: authResource.name,
-      uri: authResource.uri,
-    });
+  // Register auth resource
+  const authResource = createAuthResource();
+  server.resource(authResource.name, authResource.uri, authResource.read);
+  logger.info("Auth resource registered", {
+    name: authResource.name,
+    uri: authResource.uri,
+  });
 
-    //TODO: TOOLS DEFINITION
-    //
-  }
-  // pre setup from when redis is needed.
-  // {
-  //   redisUrl: env.REDIS_URL,
-  //   basePath: "",
-  //   verboseLogs: true,
-  //   maxDuration: 60,
-  // }
-);
+  //TODO: TOOLS DEFINITION
+  //
+});
 
 logger.info("MCP experiment handler created successfully", {
   redisUrl: !!env.REDIS_URL,

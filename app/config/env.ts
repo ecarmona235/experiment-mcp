@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { z } from "zod";
 import { Logger } from "@/app/utils/logger";
-import { string } from "zod/v4";
+import { env as env_from_file } from "@/app/config/env";
 
 const logger = new Logger("Config:Env");
 
@@ -14,7 +14,7 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(), // used for google auth
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string(),
-  GOOGLE_SCOPES: z.array(z.string()),
+  GOOGLE_SCOPES: z.string(),
 });
 
 // Function to validate environment variables
@@ -22,12 +22,12 @@ const validateEnv = () => {
   try {
     logger.info("Validating environment variables");
     const env = {
-      REDIS_URL: process.env.REDIS_URL,
-      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-      GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
-      GOOGLE_SCOPES: process.env.GOOGLE_SCOPES?.split(",").map(scope =>
+      REDIS_URL: env_from_file.REDIS_URL,
+      GOOGLE_API_KEY: env_from_file.GOOGLE_API_KEY,
+      GOOGLE_CLIENT_ID: env_from_file.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: env_from_file.GOOGLE_CLIENT_SECRET,
+      GOOGLE_REDIRECT_URI: env_from_file.GOOGLE_REDIRECT_URI,
+      GOOGLE_SCOPES: env_from_file.GOOGLE_SCOPES?.split(",").map(scope =>
         scope.trim()
       ), // List of scopes to be used for google auth
     };
