@@ -1,0 +1,1 @@
+export { createAuthResource } from "./auth";

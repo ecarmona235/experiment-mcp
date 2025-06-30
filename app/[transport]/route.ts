@@ -2,6 +2,7 @@ import { createMcpHandler } from "@vercel/mcp-adapter";
 import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
+import { createAuthResource } from "@/app/resources";
 
 export const maxDuration = 800;
 
@@ -10,10 +11,18 @@ const logger = new Logger("MCP:Experiment");
 const handler = createMcpHandler(
   server => {
     logger.info("Initializing MCP handler");
-    //TODO: Resources definition
+
+    // Register auth resource
+    const authResource = createAuthResource();
+    server.resource(authResource.name, authResource.uri, authResource.read);
+    logger.info("Auth resource registered", {
+      name: authResource.name,
+      uri: authResource.uri,
+    });
+
     //TODO: TOOLS DEFINITION
     //
-  },
+  }
   // pre setup from when redis is needed.
   // {
   //   redisUrl: env.REDIS_URL,
@@ -28,6 +37,5 @@ logger.info("MCP experiment handler created successfully", {
   verboseLogs: true,
   maxDuration: 60,
 });
-
 
 export { handler as GET, handler as POST, handler as DELETE };
