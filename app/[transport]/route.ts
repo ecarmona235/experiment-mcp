@@ -2,7 +2,7 @@ import { createMcpHandler } from "@vercel/mcp-adapter";
 import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
-import { createAuthResource } from "@/app/resources";
+import { createAuthResource, googleAPIService } from "@/app/resources";
 
 export const maxDuration = 800;
 
@@ -18,6 +18,9 @@ const handler = createMcpHandler(server => {
     name: authResource.name,
     uri: authResource.uri,
   });
+
+  
+
 
   //TODO: TOOLS DEFINITION
   //
