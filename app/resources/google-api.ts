@@ -3,7 +3,6 @@ import { Logger } from "@/app/utils/logger";
 import { getRedisClient } from "@/app/utils/redis";
 import { env } from "@/app/config/env";
 import * as fs from "fs";
-import * as path from "path";
 import mimeLookup from "mime";
 
 const logger = new Logger("GoogleAPI");
@@ -126,7 +125,6 @@ export class GoogleAPIService {
           expiresAt: new Date(tokens.expires_at * 1000).toISOString(),
           currentTime: new Date().toISOString(),
         });
-        // TODO: Implement token refresh logic
         throw new Error("Token expired. Please re-authenticate.");
       }
 
@@ -153,7 +151,9 @@ export class GoogleAPIService {
     }
   }
 
-  async getUserProfile(sessionId: string = "default") {
+  async getUserProfile(
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; profile?: any; error?: string }> {
     logger.info("Getting user profile", { sessionId });
 
     try {
@@ -187,7 +187,12 @@ export class GoogleAPIService {
     }
   }
 
-  async listGmailLabels(sessionId: string = "default") {
+  async listGmailLabels(sessionId: string = "default"): Promise<{
+    success: boolean;
+    labels?: any[];
+    total?: number;
+    error?: string;
+  }> {
     logger.info("Listing Gmail labels", { sessionId });
 
     try {
@@ -229,7 +234,13 @@ export class GoogleAPIService {
     query: string,
     maxResults: number = 5,
     sessionId: string = "default"
-  ) {
+  ): Promise<{
+    success: boolean;
+    messages?: any[];
+    total?: number;
+    query?: string;
+    error?: string;
+  }> {
     logger.info("Searching Gmail", {
       sessionId,
       query,
@@ -379,7 +390,16 @@ export class GoogleAPIService {
     }
   }
 
-  async sendGmailDraft(draftId: string, sessionId: string = "default") {
+  async sendGmailDraft(
+    draftId: string,
+    sessionId: string = "default"
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    messageId?: string | null;
+    threadId?: string | null;
+    error?: string;
+  }> {
     logger.info("Sending Gmail draft", {
       sessionId,
       draftId,
@@ -429,7 +449,14 @@ export class GoogleAPIService {
     replyText: string,
     sessionId: string = "default",
     attachments: { filename: string; path: string }[] = []
-  ) {
+  ): Promise<{
+    success: boolean;
+    messageId?: string | null;
+    threadId?: string | null;
+    message?: string;
+    attachmentsCount?: number;
+    error?: string;
+  }> {
     logger.info("Starting Gmail reply process", {
       messageId,
       sessionId,
@@ -563,6 +590,83 @@ export class GoogleAPIService {
     }
   }
 
+  async getGmailMessage(
+    messageId: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; message?: any; error?: string }> {
+    logger.info("Getting Gmail message", { messageId, sessionId });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const gmail = google.gmail({ version: "v1", auth });
+
+      const response = await gmail.users.messages.get({
+        userId: "me",
+        id: messageId,
+      });
+
+      logger.info("Gmail message retrieved successfully", {
+        messageId,
+        sessionId,
+        message: response.data,
+      });
+
+      return {
+        success: true,
+        message: response.data,
+      };
+    } catch (error) {
+      logger.error("Error getting Gmail message", {
+        messageId,
+        sessionId,
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getGmailMessageThread(
+    threadId: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; thread?: any; error?: string }> {
+    logger.info("Getting Gmail message thread", { threadId, sessionId });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const gmail = google.gmail({ version: "v1", auth });
+
+      const response = await gmail.users.threads.get({
+        userId: "me",
+        id: threadId,
+      });
+
+      logger.info("Gmail message thread retrieved successfully", {
+        threadId,
+        sessionId,
+        thread: response.data,
+      });
+
+      return {
+        success: true,
+        thread: response.data,
+      };
+    } catch (error) {
+      logger.error("Error getting Gmail message thread", {
+        threadId,
+        sessionId,
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
   // Calendar API
   async listCalendarEvents(
     calendarId: string = "primary",
@@ -570,7 +674,14 @@ export class GoogleAPIService {
     timeMax?: string,
     maxResults: number = 5,
     sessionId: string = "default"
-  ) {
+  ): Promise<{
+    success: boolean;
+    events?: any[];
+    total?: number;
+    calendarId?: string;
+    timeRange?: { timeMin?: string; timeMax?: string };
+    error?: string;
+  }> {
     logger.info("Listing calendar events", {
       sessionId,
       calendarId,
