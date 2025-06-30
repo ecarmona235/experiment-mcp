@@ -29,7 +29,7 @@ export function createAuthResource() {
             authenticated: false,
             message:
               "No authentication tokens found. Please authenticate first.",
-            authUrl: "/pages/auth/login",
+            authUrl: "/auth/login",
             sessionId,
           };
         } else {
@@ -47,7 +47,7 @@ export function createAuthResource() {
             hasRefreshToken: !!tokens.refresh_token,
             expiresAt: tokens.expiry_date,
             scopes: tokens.scope?.split(" ") || [],
-            authUrl: "/pages/auth/login",
+            authUrl: "/auth/login",
           };
         }
 
@@ -71,7 +71,7 @@ export function createAuthResource() {
                   authenticated: false,
                   error: "Failed to read authentication status",
                   message: "Authentication service unavailable",
-                  authUrl: "/pages/auth/login",
+                  authUrl: "/auth/login",
                 },
                 null,
                 2

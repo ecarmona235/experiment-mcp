@@ -1,9 +1,12 @@
 import { google } from "googleapis";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/app/config/env";
 import { storeTokens } from "@/app/utils/redis";
 import { randomUUID } from "crypto";
 import { Logger } from "@/app/utils/logger";
+
+// This page should only run on the server side
+export const runtime = "nodejs";
 
 const logger = new Logger("OAuth:Callback");
 
@@ -11,21 +14,22 @@ function generateSessionId(): string {
   return randomUUID();
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const code = req.query.code;
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
 
   logger.info("OAuth callback received", {
     hasCode: !!code,
     codeType: typeof code,
-    query: req.query,
+    searchParams: Object.fromEntries(searchParams.entries()),
   });
 
   if (!code || typeof code !== "string") {
     logger.warn("Invalid authorization code received", { code });
-    return res.status(400).json({ error: "Invalid authorization code" });
+    return NextResponse.json(
+      { error: "Invalid authorization code" },
+      { status: 400 }
+    );
   }
 
   logger.info("Initializing OAuth2 client");
@@ -47,17 +51,17 @@ export default async function handler(
     });
 
     // Store tokens in Redis (using a session ID or user ID)
-    const sessionId = req.query.state || generateSessionId();
+    const sessionId = searchParams.get("state") || generateSessionId();
     logger.info("Storing tokens in Redis", {
       sessionId,
-      hasState: !!req.query.state,
+      hasState: !!searchParams.get("state"),
     });
 
-    await storeTokens(sessionId as string, response.tokens);
+    await storeTokens(sessionId, response.tokens);
 
     logger.info("OAuth flow completed successfully");
 
-    res.status(200).json({
+    return NextResponse.json({
       success: true,
       sessionId,
       message: "OAuth authentication successful",
@@ -66,6 +70,9 @@ export default async function handler(
     logger.error("OAuth Callback Error", error, {
       code: code.substring(0, 10) + "...",
     });
-    res.status(500).json({ error: "Failed to authenticate" });
+    return NextResponse.json(
+      { error: "Failed to authenticate" },
+      { status: 500 }
+    );
   }
 }

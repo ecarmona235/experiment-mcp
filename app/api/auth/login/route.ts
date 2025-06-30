@@ -1,11 +1,11 @@
 import { google } from "googleapis";
 import { env } from "@/app/config/env";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(
-  _req: NextApiRequest,
-  res: NextApiResponse
-) {
+// This page should only run on the server side
+export const runtime = "nodejs";
+
+export async function GET(request: NextRequest) {
   const oauth2Client = new google.auth.OAuth2(
     env.GOOGLE_CLIENT_ID,
     env.GOOGLE_CLIENT_SECRET,
@@ -18,5 +18,5 @@ export default async function handler(
     scope: env.GOOGLE_SCOPES,
   });
 
-  res.redirect(authUrl);
+  return NextResponse.redirect(authUrl);
 }

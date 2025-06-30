@@ -1,0 +1,29 @@
+# MCP Server Configuration for Cursor
+
+## OAuth Authentication MCP Server
+This project includes an MCP server with Google OAuth authentication capabilities.
+
+### Available Resources:
+- `auth://oauth/google` - Authentication status and OAuth flow management
+
+### Testing the Authentication Flow:
+
+1. **Check Authentication Status:**
+   Ask me to check the current authentication status using the auth resource.
+
+2. **Initiate OAuth Login:**
+   If not authenticated, I can help you start the OAuth flow by visiting the login endpoint.
+
+3. **Verify Callback:**
+   After authentication, I can verify that tokens were stored correctly.
+
+### Environment Setup:
+Make sure you have:
+- Redis running locally (`redis://localhost:6379`)
+- Google OAuth credentials configured in `.env`
+- The MCP server running on `http://localhost:3000`
+
+### Example Commands:
+- "Check if I'm authenticated with Google OAuth"
+- "Start the OAuth authentication process"
+- "Show me my current authentication status" 
