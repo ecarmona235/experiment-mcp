@@ -3,6 +3,7 @@ import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
 import { createAuthResource, googleAPIService } from "@/app/resources";
+import { gmailTools } from "@/app/tools";
 
 export const maxDuration = 800;
 
@@ -19,11 +20,26 @@ const handler = createMcpHandler(server => {
     uri: authResource.uri,
   });
 
-  
-
-
-  //TODO: TOOLS DEFINITION
-  //
+  // Register Gmail tools
+  gmailTools.forEach(tool => {
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.inputSchema.shape,
+      async (args: any) => {
+        const result = await tool.handler(args);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+    logger.info("Gmail tool registered", { name: tool.name });
+  });
 });
 
 logger.info("MCP experiment handler created successfully", {
