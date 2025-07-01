@@ -17,8 +17,29 @@ export function createAuthResource() {
       logger.info("Reading auth resource");
 
       try {
-        // For now, use a default session - in production you'd get this from context
-        const sessionId = "default";
+        // Use session ID from Cursor's Secrets (env) if available
+        const sessionId = process.env.GOOGLE_MCP_SESSION_ID;
+        if (!sessionId) {
+          return {
+            contents: [
+              {
+                uri: "auth://oauth/google",
+                text: JSON.stringify(
+                  {
+                    authenticated: false,
+                    error: "No session ID found.",
+                    message:
+                      "Please log in and set your session ID in the Cursor Secrets section as MCP_SESSION_ID.",
+                    authUrl: "/auth/login",
+                  },
+                  null,
+                  2
+                ),
+                mimeType: "application/json",
+              },
+            ],
+          };
+        }
         const tokens = await getTokens(sessionId);
 
         let authData: any;

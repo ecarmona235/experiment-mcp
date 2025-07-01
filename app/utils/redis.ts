@@ -33,7 +33,7 @@ export async function storeTokens(userId: string, tokens: any) {
     logger.info("Storing OAuth tokens in Redis", { userId, key });
 
     // Store tokens with expiration (e.g., 1 hour for access token)
-    await client.setEx(key, 3600, JSON.stringify(tokens));
+    await client.setEx(key, 60 * 60 * 24 * 30, JSON.stringify(tokens));
 
     logger.info("OAuth tokens stored successfully", { userId, key });
     return key;

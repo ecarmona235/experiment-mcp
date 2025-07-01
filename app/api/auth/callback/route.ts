@@ -44,28 +44,47 @@ export async function GET(request: NextRequest) {
     const response = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(response.tokens);
 
-    logger.info("Tokens received successfully", {
-      hasAccessToken: !!response.tokens.access_token,
-      hasRefreshToken: !!response.tokens.refresh_token,
-      tokenType: response.tokens.token_type,
-    });
+    logger.info("Tokens received successfully");
 
     // Store tokens in Redis (using a session ID or user ID)
     const sessionId = searchParams.get("state") || generateSessionId();
-    logger.info("Storing tokens in Redis", {
-      sessionId,
-      hasState: !!searchParams.get("state"),
-    });
+    logger.info("Storing tokens in Redis");
 
     await storeTokens(sessionId, response.tokens);
 
     logger.info("OAuth flow completed successfully");
 
-    return NextResponse.json({
-      success: true,
-      sessionId,
-      message: "OAuth authentication successful",
-    });
+    // Return an HTML page with instructions
+    return new NextResponse(
+      `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>OAuth Success</title>
+        <style>
+          body { font-family: sans-serif; background: #f9f9f9; color: #222; padding: 2em; }
+          .container { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 2em; max-width: 500px; margin: 2em auto; }
+          code { background: #eee; padding: 0.2em 0.4em; border-radius: 4px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h2>OAuth Authentication Successful!</h2>
+          <p>Your session ID is:</p>
+          <p><code>${sessionId}</code></p>
+          <p>
+            <strong>Copy this session ID and add it as a secret in Cursor:</strong><br>
+            <code>GOOGLE_MCP_SESSION_ID</code> = <code>${sessionId}</code>
+          </p>
+          <p>
+            In Cursor, go to the <b>Secrets</b> section and add a new secret with the name <code>GOOGLE_MCP_SESSION_ID</code> and the value above.<br>
+            Then, re-run your MCP tool or resource.
+          </p>
+        </div>
+      </body>
+      </html>`,
+      { status: 200, headers: { "Content-Type": "text/html" } }
+    );
   } catch (error) {
     logger.error("OAuth Callback Error", error, {
       code: code.substring(0, 10) + "...",
