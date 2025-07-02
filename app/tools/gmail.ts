@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { googleAPIService } from "@/app/resources/google-api";
+import { env } from "../config/env";
 
 export const gmailTools = [
   {
@@ -15,7 +16,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
     }),
     handler: async ({
@@ -33,7 +33,11 @@ export const gmailTools = [
       query?: string;
       error?: string;
     }> => {
-      return await googleAPIService.searchGmail(query, maxResults, sessionId);
+      return await googleAPIService.searchGmail(
+        query,
+        maxResults,
+        sessionId || env.GOOGLE_MCP_SESSION_ID
+      );
     },
   },
   {
@@ -43,7 +47,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
     }),
     handler: async ({
@@ -56,7 +59,9 @@ export const gmailTools = [
       total?: number;
       error?: string;
     }> => {
-      return await googleAPIService.listGmailLabels(sessionId);
+      return await googleAPIService.listGmailLabels(
+        sessionId || env.GOOGLE_MCP_SESSION_ID
+      );
     },
   },
 
@@ -70,7 +75,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
       attachments: z
         .array(
@@ -100,7 +104,7 @@ export const gmailTools = [
         to,
         subject,
         htmlBody,
-        sessionId,
+        sessionId || env.GOOGLE_MCP_SESSION_ID,
         attachments
       );
     },
@@ -114,7 +118,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
     }),
     handler: async ({
@@ -130,7 +133,10 @@ export const gmailTools = [
       threadId?: string | null;
       error?: string;
     }> => {
-      return await googleAPIService.sendGmailDraft(draftId, sessionId);
+      return await googleAPIService.sendGmailDraft(
+        draftId,
+        sessionId || env.GOOGLE_MCP_SESSION_ID
+      );
     },
   },
 
@@ -143,7 +149,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
       attachments: z
         .array(
@@ -177,7 +182,7 @@ export const gmailTools = [
       return await googleAPIService.replyToGmailMessage(
         messageId,
         replyText,
-        sessionId,
+        sessionId || env.GOOGLE_MCP_SESSION_ID,
         attachments
       );
     },
@@ -191,7 +196,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
     }),
     handler: async ({
@@ -201,7 +205,10 @@ export const gmailTools = [
       messageId: string;
       sessionId?: string;
     }): Promise<{ success: boolean; message?: any; error?: string }> => {
-      return await googleAPIService.getGmailMessage(messageId, sessionId);
+      return await googleAPIService.getGmailMessage(
+        messageId,
+        sessionId || env.GOOGLE_MCP_SESSION_ID
+      );
     },
   },
 
@@ -213,7 +220,6 @@ export const gmailTools = [
       sessionId: z
         .string()
         .optional()
-        .default("default")
         .describe("Session ID for authentication"),
     }),
     handler: async ({
@@ -223,7 +229,10 @@ export const gmailTools = [
       threadId: string;
       sessionId?: string;
     }): Promise<{ success: boolean; thread?: any; error?: string }> => {
-      return await googleAPIService.getGmailMessageThread(threadId, sessionId);
+      return await googleAPIService.getGmailMessageThread(
+        threadId,
+        sessionId || env.GOOGLE_MCP_SESSION_ID
+      );
     },
   },
 ];

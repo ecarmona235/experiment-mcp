@@ -15,10 +15,7 @@ const handler = createMcpHandler(server => {
   // Register auth resource
   const authResource = createAuthResource();
   server.resource(authResource.name, authResource.uri, authResource.read);
-  logger.info("Auth resource registered", {
-    name: authResource.name,
-    uri: authResource.uri,
-  });
+  logger.info("Auth resource registered");
 
   // Register Gmail tools
   gmailTools.forEach(tool => {

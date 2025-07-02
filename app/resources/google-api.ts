@@ -11,6 +11,7 @@ interface GoogleTokens {
   access_token: string;
   refresh_token: string;
   expires_at: number;
+  scope?: string;
 }
 
 /**
@@ -95,9 +96,8 @@ function buildMimeMessage(
 }
 
 export class GoogleAPIService {
-  private async getAuthenticatedClient(sessionId: string = "default") {
-    logger.info("Getting authenticated client", { sessionId });
-
+  private async getAuthenticatedClient(sessionId: string) {
+    logger.info("Getting authenticated client");
     try {
       const redis = await getRedisClient();
       const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
@@ -108,20 +108,16 @@ export class GoogleAPIService {
           "No authentication tokens found. Please authenticate first."
         );
       }
-
       const tokens: GoogleTokens = JSON.parse(tokensJson);
 
-      logger.info("Tokens retrieved from Redis", {
-        sessionId,
-        hasAccessToken: !!tokens.access_token,
-        hasRefreshToken: !!tokens.refresh_token,
-        expiresAt: new Date(tokens.expires_at * 1000).toISOString(),
-      });
+      logger.info(
+        "Tokens retrieved from Redis",
+        tokens.scope?.split(" ") || []
+      );
 
       // Check if token is expired
       if (Date.now() >= tokens.expires_at * 1000) {
         logger.warn("Access token expired", {
-          sessionId,
           expiresAt: new Date(tokens.expires_at * 1000).toISOString(),
           currentTime: new Date().toISOString(),
         });
@@ -139,12 +135,11 @@ export class GoogleAPIService {
         refresh_token: tokens.refresh_token,
       });
 
-      logger.info("OAuth2 client configured successfully", { sessionId });
+      logger.info("OAuth2 client configured successfully");
 
       return oauth2Client;
     } catch (error) {
       logger.error("Error getting authenticated client", {
-        sessionId,
         error: error instanceof Error ? error.message : "Unknown error",
       });
       throw error;
@@ -154,7 +149,7 @@ export class GoogleAPIService {
   async getUserProfile(
     sessionId: string = "default"
   ): Promise<{ success: boolean; profile?: any; error?: string }> {
-    logger.info("Getting user profile", { sessionId });
+    logger.info("Getting user profile");
 
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
@@ -163,12 +158,7 @@ export class GoogleAPIService {
       logger.info("Fetching user info from Google OAuth2 API");
       const response = await oauth2.userinfo.get();
 
-      logger.info("User profile retrieved successfully", {
-        sessionId,
-        userId: response.data.id,
-        email: response.data.email,
-        name: response.data.name,
-      });
+      logger.info("User profile retrieved successfully");
 
       return {
         success: true,
@@ -193,7 +183,7 @@ export class GoogleAPIService {
     total?: number;
     error?: string;
   }> {
-    logger.info("Listing Gmail labels", { sessionId });
+    logger.info("Listing Gmail labels");
 
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
@@ -206,11 +196,7 @@ export class GoogleAPIService {
 
       const labels = response.data.labels || [];
 
-      logger.info("Gmail labels retrieved successfully", {
-        sessionId,
-        labelsCount: labels.length,
-        labelNames: labels.map(l => l.name),
-      });
+      logger.info("Gmail labels retrieved successfully");
 
       return {
         success: true,
@@ -241,6 +227,15 @@ export class GoogleAPIService {
     query?: string;
     error?: string;
   }> {
+    logger.info("[DEBUG] searchGmail called", { sessionId });
+    // Retrieve tokens for logging
+    const redis = await getRedisClient();
+    const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
+    logger.info("[DEBUG] Token object:", tokensJson);
+    if (tokensJson) {
+      const tokens = JSON.parse(tokensJson);
+      logger.info("[DEBUG] Token scopes:", tokens.scope?.split(" ") || []);
+    }
     logger.info("Searching Gmail", {
       sessionId,
       query,
@@ -251,7 +246,7 @@ export class GoogleAPIService {
       const auth = await this.getAuthenticatedClient(sessionId);
       const gmail = google.gmail({ version: "v1", auth });
 
-      logger.info("Searching messages in Gmail API", { query, maxResults });
+      logger.info("Searching messages in Gmail API");
       const response = await gmail.users.messages.list({
         userId: "me",
         q: query,
@@ -260,25 +255,14 @@ export class GoogleAPIService {
 
       const messages = response.data.messages || [];
 
-      logger.info("Initial search results", {
-        sessionId,
-        query,
-        messagesFound: messages.length,
-        resultSizeEstimate: response.data.resultSizeEstimate,
-      });
+      logger.info("Initial search results");
 
       // Get full message details for each message
-      logger.info("Fetching full message details", {
-        sessionId,
-        messageCount: messages.length,
-      });
+      logger.info("Fetching full message details");
 
       const messageDetails = await Promise.all(
         messages.map(async (message, index) => {
-          logger.info(`Fetching message ${index + 1}/${messages.length}`, {
-            sessionId,
-            messageId: message.id,
-          });
+          logger.info(`Fetching message `);
 
           const detail = await gmail.users.messages.get({
             userId: "me",
@@ -289,12 +273,7 @@ export class GoogleAPIService {
         })
       );
 
-      logger.info("Gmail search completed successfully", {
-        sessionId,
-        query,
-        totalMessages: messageDetails.length,
-        messageIds: messageDetails.map(m => m.id),
-      });
+      logger.info("Gmail search completed successfully");
 
       return {
         success: true,

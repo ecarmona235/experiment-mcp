@@ -13,6 +13,7 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string(),
   GOOGLE_SCOPES: z.array(z.string()),
+  GOOGLE_MCP_SESSION_ID: z.string(),
 });
 
 // Function to validate environment variables
@@ -25,12 +26,15 @@ const validateEnv = () => {
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
       GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+      GOOGLE_MCP_SESSION_ID: process.env.GOOGLE_MCP_SESSION_ID,
       GOOGLE_SCOPES: process.env.GOOGLE_SCOPES?.split(",").map(scope =>
         scope.trim()
       ), // List of scopes to be used for google auth
     };
+    logger.info("Environment variables", env.GOOGLE_SCOPES?.length);
     const parsed = envSchema.parse(env);
     logger.info("Environment variables validated successfully");
+
     return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {

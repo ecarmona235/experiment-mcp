@@ -53,7 +53,7 @@ export async function getTokens(userId: string) {
     const tokens = await client.get(key);
 
     if (tokens) {
-      logger.info("OAuth tokens retrieved successfully", { userId });
+      logger.info("OAuth tokens retrieved successfully");
       return JSON.parse(tokens);
     } else {
       logger.warn("No OAuth tokens found for user", { userId });

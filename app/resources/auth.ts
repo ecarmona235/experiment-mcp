@@ -1,6 +1,6 @@
 import { Logger } from "@/app/utils/logger";
 import { getTokens, storeTokens } from "@/app/utils/redis";
-
+import { env } from "@/app/config/env";
 const logger = new Logger("MCP:Auth:Resource");
 
 export function createAuthResource() {
@@ -18,7 +18,8 @@ export function createAuthResource() {
 
       try {
         // Use session ID from Cursor's Secrets (env) if available
-        const sessionId = process.env.GOOGLE_MCP_SESSION_ID;
+        const sessionId = env.GOOGLE_MCP_SESSION_ID;
+        logger.info("Session ID found");
         if (!sessionId) {
           return {
             contents: [
@@ -40,6 +41,7 @@ export function createAuthResource() {
             ],
           };
         }
+        logger.info("Session ID found", { sessionId });
         const tokens = await getTokens(sessionId);
 
         let authData: any;
@@ -54,11 +56,7 @@ export function createAuthResource() {
             sessionId,
           };
         } else {
-          logger.info("Authentication tokens found", {
-            sessionId,
-            hasAccessToken: !!tokens.access_token,
-            hasRefreshToken: !!tokens.refresh_token,
-          });
+          logger.info("Authentication tokens found", tokens.expiry_date);
 
           authData = {
             authenticated: true,
@@ -66,12 +64,12 @@ export function createAuthResource() {
             tokenType: tokens.token_type,
             hasAccessToken: !!tokens.access_token,
             hasRefreshToken: !!tokens.refresh_token,
-            expiresAt: tokens.expiry_date,
+            expiresAt: tokens.expiry_date || null,
             scopes: tokens.scope?.split(" ") || [],
             authUrl: "/auth/login",
           };
         }
-
+        logger.info("Token scopes:", tokens.scope?.split(" ") || []);
         return {
           contents: [
             {
