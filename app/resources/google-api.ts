@@ -655,7 +655,7 @@ export class GoogleAPIService {
     }
   }
   // ================================
-  // Calendar API
+  // Calendar Events API
   // ================================
   async listCalendarEvents(
     calendarId: string = "primary",
@@ -706,7 +706,6 @@ export class GoogleAPIService {
       const events = response.data.items || [];
 
       logger.info("Calendar events retrieved successfully", {
-        sessionId,
         calendarId,
         eventsCount: events.length,
         eventSummaries: events.map(e => e.summary),
@@ -722,7 +721,6 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error listing calendar events", {
-        sessionId,
         calendarId,
         timeMin,
         timeMax,
@@ -736,6 +734,108 @@ export class GoogleAPIService {
       };
     }
   }
+
+  async createGoogleCalendarEvent(
+    calendarId: string = "primary",
+    event: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; event?: any; error?: string }> {
+    logger.info("Creating Google calendar event", { calendarId, event });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendar = google.calendar({ version: "v3", auth });
+
+      const response = await calendar.events.insert({
+        calendarId,
+        requestBody: event,
+      });
+
+      return {
+        success: true,
+        event: response.data,
+      };
+    } catch (error) {
+      logger.error("Error creating Google calendar event", {
+        calendarId,
+        event,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async updateGoogleCalendarEvent(
+    calendarId: string = "primary",
+    eventId: string,
+    event: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; event?: any; error?: string }> {
+    logger.info("Updating Google calendar event");
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendar = google.calendar({ version: "v3", auth });
+
+      const response = await calendar.events.update({
+        calendarId,
+        eventId,
+        requestBody: event,
+      });
+
+      return {
+        success: true,
+        event: response.data,
+      };
+    } catch (error) {
+      logger.error("Error updating Google calendar event", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async deleteGoogleCalendarEvent(
+    calendarId: string = "primary",
+    eventId: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; error?: string }> {
+    logger.info("Deleting Google calendar event", { calendarId, eventId });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendar = google.calendar({ version: "v3", auth });
+
+      await calendar.events.delete({
+        calendarId,
+        eventId,
+      });
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      logger.error("Error deleting Google calendar event", {
+        calendarId,
+        eventId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  // ================================
+  // Calendar Calendars API
+  // ================================
 
   async getGoogleCalendar(
     calendarId: string = "primary",
@@ -757,6 +857,121 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error getting Google calendar", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+  
+  async updateGoogleCalendar(
+    calendarId: string = "primary",
+    calendar: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; calendar?: any; error?: string }> {
+    logger.info("Updating Google calendar", { calendarId, calendar });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendarService = google.calendar({ version: "v3", auth });
+
+      const response = await calendarService.calendars.update({
+        calendarId,
+        requestBody: calendar,
+      });
+
+      return {
+        success: true,
+        calendar: response.data,
+      };
+    } catch (error) {
+      logger.error("Error updating Google calendar", {
+        calendarId,
+        calendar,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async deleteGoogleCalendar(
+    calendarId: string = "primary",
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; error?: string }> {
+    logger.info("Deleting Google calendar", { calendarId });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendarService = google.calendar({ version: "v3", auth });
+
+      await calendarService.calendars.delete({
+        calendarId,
+      });
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      logger.error("Error deleting Google calendar", {
+        calendarId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async createGoogleCalendar(
+    calendar: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; calendar?: any; error?: string }> {
+    logger.info("Creating Google calendar", { calendar });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendarService = google.calendar({ version: "v3", auth });
+
+      const response = await calendarService.calendars.insert({
+        requestBody: calendar,
+      });
+
+      return {
+        success: true,
+        calendar: response.data,
+      };
+    } catch (error) {
+      logger.error("Error creating Google calendar", {
+        calendar,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async listGoogleCalendars(
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; calendars?: any[]; error?: string }> {
+    logger.info("Listing Google calendars");
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendarService = google.calendar({ version: "v3", auth });
+
+      const response = await calendarService.calendarList.list({});
+
+      return {
+        success: true,
+        calendars: response.data.items,
+      };
+    } catch (error) {
+      logger.error("Error listing Google calendars", {
         error: error instanceof Error ? error.message : "Unknown error",
       });
       return {
