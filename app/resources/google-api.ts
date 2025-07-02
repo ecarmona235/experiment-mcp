@@ -96,6 +96,9 @@ function buildMimeMessage(
 }
 
 export class GoogleAPIService {
+  // ================================
+  // Authentication
+  // ================================
   private async getAuthenticatedClient(sessionId: string) {
     logger.info("Getting authenticated client");
     try {
@@ -145,7 +148,9 @@ export class GoogleAPIService {
       throw error;
     }
   }
-
+  // ================================
+  // Google User profile
+  // ================================
   async getUserProfile(
     sessionId: string = "default"
   ): Promise<{ success: boolean; profile?: any; error?: string }> {
@@ -177,6 +182,9 @@ export class GoogleAPIService {
     }
   }
 
+  // ================================
+  // Gmail API
+  // ================================
   async listGmailLabels(sessionId: string = "default"): Promise<{
     success: boolean;
     labels?: any[];
@@ -646,7 +654,9 @@ export class GoogleAPIService {
       };
     }
   }
+  // ================================
   // Calendar API
+  // ================================
   async listCalendarEvents(
     calendarId: string = "primary",
     timeMin?: string,
@@ -719,6 +729,35 @@ export class GoogleAPIService {
         maxResults,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getGoogleCalendar(
+    calendarId: string = "primary",
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; calendar?: any; error?: string }> {
+    logger.info("Getting Google calendar", { calendarId, sessionId });
+
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendar = google.calendar({ version: "v3", auth });
+
+      const response = await calendar.calendars.get({
+        calendarId,
+      });
+
+      return {
+        success: true,
+        calendar: response.data,
+      };
+    } catch (error) {
+      logger.error("Error getting Google calendar", {
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       return {
         success: false,

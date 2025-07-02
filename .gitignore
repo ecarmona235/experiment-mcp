@@ -39,3 +39,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 cursor-mcp-config.json
+gmail_test.js
+
+# redis
+*/dump.rdb
+dump.rdb
+
