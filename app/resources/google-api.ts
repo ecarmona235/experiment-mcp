@@ -100,8 +100,11 @@ export class GoogleAPIService {
   // Authentication
   // ================================
   private async getAuthenticatedClient(sessionId: string) {
-    logger.info("Getting authenticated client");
+    logger.info("Getting authenticated client", { sessionId });
     try {
+      if (sessionId === "default") {
+        sessionId = env.GOOGLE_MCP_SESSION_ID;
+      }
       const redis = await getRedisClient();
       const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
 
@@ -213,7 +216,6 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error listing Gmail labels", {
-        sessionId,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -235,21 +237,6 @@ export class GoogleAPIService {
     query?: string;
     error?: string;
   }> {
-    logger.info("[DEBUG] searchGmail called", { sessionId });
-    // Retrieve tokens for logging
-    const redis = await getRedisClient();
-    const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
-    logger.info("[DEBUG] Token object:", tokensJson);
-    if (tokensJson) {
-      const tokens = JSON.parse(tokensJson);
-      logger.info("[DEBUG] Token scopes:", tokens.scope?.split(" ") || []);
-    }
-    logger.info("Searching Gmail", {
-      sessionId,
-      query,
-      maxResults,
-    });
-
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
       const gmail = google.gmail({ version: "v1", auth });
@@ -291,7 +278,6 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error searching Gmail", {
-        sessionId,
         query,
         maxResults,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -446,7 +432,6 @@ export class GoogleAPIService {
   }> {
     logger.info("Starting Gmail reply process", {
       messageId,
-      sessionId,
       replyTextLength: replyText.length,
       attachmentsCount: attachments.length,
       attachmentNames: attachments.map(a => a.filename),
@@ -565,7 +550,6 @@ export class GoogleAPIService {
     } catch (error) {
       logger.error("Error replying to Gmail message", {
         messageId,
-        sessionId,
         attachmentsCount: attachments.length,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
@@ -581,7 +565,7 @@ export class GoogleAPIService {
     messageId: string,
     sessionId: string = "default"
   ): Promise<{ success: boolean; message?: any; error?: string }> {
-    logger.info("Getting Gmail message", { messageId, sessionId });
+    logger.info("Getting Gmail message", { messageId });
 
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
@@ -594,7 +578,6 @@ export class GoogleAPIService {
 
       logger.info("Gmail message retrieved successfully", {
         messageId,
-        sessionId,
         message: response.data,
       });
 
@@ -605,7 +588,6 @@ export class GoogleAPIService {
     } catch (error) {
       logger.error("Error getting Gmail message", {
         messageId,
-        sessionId,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -672,7 +654,6 @@ export class GoogleAPIService {
     error?: string;
   }> {
     logger.info("Listing calendar events", {
-      sessionId,
       calendarId,
       timeMin,
       timeMax,
@@ -865,7 +846,7 @@ export class GoogleAPIService {
       };
     }
   }
-  
+
   async updateGoogleCalendar(
     calendarId: string = "primary",
     calendar: any,
@@ -961,6 +942,7 @@ export class GoogleAPIService {
   ): Promise<{ success: boolean; calendars?: any[]; error?: string }> {
     logger.info("Listing Google calendars");
     try {
+      logger.info("Getting authenticated client", { sessionId });
       const auth = await this.getAuthenticatedClient(sessionId);
       const calendarService = google.calendar({ version: "v3", auth });
 

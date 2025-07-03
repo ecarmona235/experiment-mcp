@@ -31,7 +31,7 @@ const validateEnv = () => {
         scope.trim()
       ), // List of scopes to be used for google auth
     };
-    logger.info("Environment variables", env.GOOGLE_SCOPES?.length);
+    logger.info("Environment variables");
     const parsed = envSchema.parse(env);
     logger.info("Environment variables validated successfully");
 

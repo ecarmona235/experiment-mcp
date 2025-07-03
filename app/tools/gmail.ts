@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { googleAPIService } from "@/app/resources/google-api";
-import { env } from "../config/env";
+import { env } from "@/app/config/env";
 
 export const gmailTools = [
   {
