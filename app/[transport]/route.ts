@@ -2,8 +2,8 @@ import { createMcpHandler } from "@vercel/mcp-adapter";
 import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
-import { createAuthResource, googleAPIService } from "@/app/resources";
-import { gmailTools } from "@/app/tools";
+import { createAuthResource } from "@/app/resources";
+import { gmailTools, calendarTools } from "@/app/tools";
 
 export const maxDuration = 800;
 
@@ -37,6 +37,22 @@ const handler = createMcpHandler(server => {
     );
     logger.info("Gmail tool registered", { name: tool.name });
   });
+
+  // Register calendar tools
+  calendarTools.forEach(tool => {
+    server.tool(tool.name, tool.description, tool.inputSchema.shape, async (args: any) => {
+      const result = await tool.handler(args);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    });
+    logger.info("Calendar tool registered", { name: tool.name });
+  });
 });
 
 logger.info("MCP experiment handler created successfully", {
@@ -45,4 +61,4 @@ logger.info("MCP experiment handler created successfully", {
   maxDuration: 60,
 });
 
-export { handler as GET, handler as POST, handler as DELETE };
+export { handler as GET, handler as POST, handler as DELETE };  
