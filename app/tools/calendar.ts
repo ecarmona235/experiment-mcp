@@ -5,63 +5,74 @@ import { env } from "@/app/config/env";
 export const calendarTools = [
   {
     name: "list_calendar_events",
-    description: "List events on a Google Calendar within a time range.",
+    description:
+      "List events from a Google Calendar within a specified time range (ISO 8601 format)",
     inputSchema: z.object({
-      calendarId: z.string().default("primary"),
-      timeMin: z.string().optional(),
-      timeMax: z.string().optional(),
-      maxResults: z.number().default(5),
-      sessionId: z
+      calendarId: z
+        .string()
+        .default("primary")
+        .describe("Calendar ID (use 'primary' for main calendar)"),
+      timeMin: z
         .string()
         .optional()
-        .describe("Session ID for authentication"),
+        .describe(
+          "Start time in ISO 8601 format (e.g., '2024-01-01T00:00:00Z')"
+        ),
+      timeMax: z
+        .string()
+        .optional()
+        .describe("End time in ISO 8601 format (e.g., '2024-01-31T23:59:59Z')"),
+      maxResults: z
+        .number()
+        .default(5)
+        .describe("Maximum number of events to return"),
     }),
     handler: async ({
       calendarId,
       timeMin,
       timeMax,
       maxResults,
-      sessionId,
     }: {
       calendarId?: string;
       timeMin?: string;
       timeMax?: string;
       maxResults?: number;
-      sessionId?: string;
     }) => {
       return await googleAPIService.listCalendarEvents(
         calendarId,
         timeMin,
         timeMax,
         maxResults,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "create_calendar_event",
-    description: "Create a new event on a Google Calendar.",
+    description:
+      "Create a new event on a Google Calendar with event details (title, start/end times, attendees, etc.)",
     inputSchema: z.object({
-      calendarId: z.string().default("primary"),
-      event: z.any(),
-      sessionId: z
+      calendarId: z
         .string()
-        .optional()
-        .describe("Session ID for authentication"),
+        .default("primary")
+        .describe("Calendar ID (use 'primary' for main calendar)"),
+      event: z
+        .any()
+        .describe(
+          "Event object with properties like summary, start, end, attendees, description"
+        ),
     }),
     handler: async ({
       calendarId,
       event,
-      sessionId,
     }: {
       calendarId?: string;
       event?: any;
-      sessionId?: string;
     }) => {
       return await googleAPIService.createGoogleCalendarEvent(
         calendarId,
         event,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -72,27 +83,21 @@ export const calendarTools = [
       calendarId: z.string().default("primary"),
       eventId: z.string().describe("The ID of the event to update"),
       event: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       calendarId,
       eventId,
       event,
-      sessionId,
     }: {
       calendarId: string;
       eventId: string;
       event?: any;
-      sessionId?: string;
     }) => {
       return await googleAPIService.updateGoogleCalendarEvent(
         calendarId,
         eventId,
         event,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -102,24 +107,18 @@ export const calendarTools = [
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
       eventId: z.string().describe("The ID of the event to delete"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       calendarId,
       eventId,
-      sessionId,
     }: {
       calendarId?: string;
       eventId: string;
-      sessionId?: string;
     }) => {
       return await googleAPIService.deleteGoogleCalendarEvent(
         calendarId,
         eventId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -128,21 +127,11 @@ export const calendarTools = [
     description: "Get a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      calendarId,
-      sessionId,
-    }: {
-      calendarId?: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ calendarId }: { calendarId?: string }) => {
       return await googleAPIService.getGoogleCalendar(
         calendarId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -152,24 +141,18 @@ export const calendarTools = [
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
       calendar: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       calendarId,
       calendar,
-      sessionId,
     }: {
       calendarId?: string;
       calendar?: any;
-      sessionId?: string;
     }) => {
       return await googleAPIService.updateGoogleCalendar(
         calendarId,
         calendar,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -178,21 +161,11 @@ export const calendarTools = [
     description: "Delete a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      calendarId,
-      sessionId,
-    }: {
-      calendarId?: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ calendarId }: { calendarId?: string }) => {
       return await googleAPIService.deleteGoogleCalendar(
         calendarId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -201,36 +174,21 @@ export const calendarTools = [
     description: "Create a Google Calendar.",
     inputSchema: z.object({
       calendar: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      calendar,
-      sessionId,
-    }: {
-      calendar?: any;
-      sessionId?: string;
-    }) => {
+    handler: async ({ calendar }: { calendar?: any }) => {
       return await googleAPIService.createGoogleCalendar(
         calendar,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "list_calendars",
     description: "List all Google Calendars.",
-    inputSchema: z.object({
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
-    }),
-    handler: async ({ sessionId }: { sessionId?: string }) => {
+    inputSchema: z.object({}),
+    handler: async () => {
       return await googleAPIService.listGoogleCalendars(
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },

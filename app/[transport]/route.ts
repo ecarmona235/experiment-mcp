@@ -24,131 +24,60 @@ const handler = createMcpHandler(server => {
   server.resource(authResource.name, authResource.uri, authResource.read);
   logger.info("Auth resource registered");
 
-  // Register Gmail tools
-  gmailTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Gmail tool registered", { name: tool.name });
-  });
+  // Helper function to register tools
+  const registerTools = (tools: any[], serviceName: string) => {
+    tools.forEach(tool => {
+      server.tool(
+        tool.name,
+        tool.description,
+        tool.inputSchema,
+        async (args: any) => {
+          try {
+            const result = await tool.handler(args);
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          } catch (error) {
+            logger.error(`Error in ${tool.name}`, {
+              error: error instanceof Error ? error.message : "Unknown error",
+            });
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: JSON.stringify(
+                    {
+                      success: false,
+                      error:
+                        error instanceof Error
+                          ? error.message
+                          : "Unknown error",
+                    },
+                    null,
+                    2
+                  ),
+                },
+              ],
+            };
+          }
+        }
+      );
+      logger.info(`${serviceName} tool registered`, { name: tool.name });
+    });
+  };
 
-  // Register calendar tools
-  calendarTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Calendar tool registered", { name: tool.name });
-  });
-
-  // Register drive tools
-  driveTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Drive tool registered", { name: tool.name });
-  });
-
-  // Register docs tools
-  docsTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Docs tool registered", { name: tool.name });
-  });
-
-  // Register sheets tools
-  sheetsTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Sheets tool registered", { name: tool.name });
-  });
-
-  // Register slides tools
-  slidesTools.forEach(tool => {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.inputSchema.shape,
-      async (args: any) => {
-        const result = await tool.handler(args);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-    );
-    logger.info("Slides tool registered", { name: tool.name });
-  });
+  // Register all tools
+  registerTools(gmailTools, "Gmail");
+  registerTools(calendarTools, "Calendar");
+  registerTools(driveTools, "Drive");
+  registerTools(docsTools, "Docs");
+  registerTools(sheetsTools, "Sheets");
+  registerTools(slidesTools, "Slides");
 });
 
 logger.info("MCP experiment handler created successfully", {

@@ -8,21 +8,11 @@ export const slidesTools = [
     description: "Get a Google Slide (presentation) by ID.",
     inputSchema: z.object({
       slideId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      slideId,
-      sessionId,
-    }: {
-      slideId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ slideId }: { slideId: string }) => {
       return await googleAPIService.getGoogleSlide(
         slideId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -31,21 +21,11 @@ export const slidesTools = [
     description: "Create a new Google Slide (presentation).",
     inputSchema: z.object({
       slide: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      slide,
-      sessionId,
-    }: {
-      slide: any;
-      sessionId?: string;
-    }) => {
+    handler: async ({ slide }: { slide: any }) => {
       return await googleAPIService.createGoogleSlide(
         slide,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -56,40 +36,27 @@ export const slidesTools = [
     inputSchema: z.object({
       slideId: z.string(),
       requests: z.array(z.any()),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       slideId,
       requests,
-      sessionId,
     }: {
       slideId: string;
       requests: any[];
-      sessionId?: string;
     }) => {
       return await googleAPIService.updateGoogleSlide(
         slideId,
         requests,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "list_google_slides",
     description: "List all Google Slides (presentations).",
-    inputSchema: z.object({
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
-    }),
-    handler: async ({ sessionId }: { sessionId?: string }) => {
-      return await googleAPIService.listGoogleSlides(
-        sessionId || env.GOOGLE_MCP_SESSION_ID
-      );
+    inputSchema: z.object({}),
+    handler: async () => {
+      return await googleAPIService.listGoogleSlides(env.GOOGLE_MCP_SESSION_ID);
     },
   },
   {
@@ -97,21 +64,11 @@ export const slidesTools = [
     description: "Delete a Google Slide (presentation) by ID.",
     inputSchema: z.object({
       slideId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      slideId,
-      sessionId,
-    }: {
-      slideId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ slideId }: { slideId: string }) => {
       return await googleAPIService.deleteGoogleSlide(
         slideId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },

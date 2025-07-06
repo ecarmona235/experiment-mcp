@@ -5,27 +5,24 @@ import { env } from "@/app/config/env";
 export const gmailTools = [
   {
     name: "search_gmail",
-    description: "Search Gmail messages",
+    description:
+      "Search Gmail messages using Gmail's search syntax (e.g., 'from:example@gmail.com', 'subject:meeting', 'has:attachment')",
     inputSchema: z.object({
-      query: z.string().describe("Search query for Gmail"),
+      query: z
+        .string()
+        .describe("Gmail search query (supports Gmail search operators)"),
       maxResults: z
         .number()
         .optional()
         .default(5)
-        .describe("Maximum number of results"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
+        .describe("Maximum number of results to return"),
     }),
     handler: async ({
       query,
       maxResults,
-      sessionId,
     }: {
       query: string;
       maxResults?: number;
-      sessionId?: string;
     }): Promise<{
       success: boolean;
       messages?: any[];
@@ -36,75 +33,59 @@ export const gmailTools = [
       return await googleAPIService.searchGmail(
         query,
         maxResults,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "list_gmail_labels",
     description: "List Gmail labels",
-    inputSchema: z.object({
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
-    }),
-    handler: async ({
-      sessionId,
-    }: {
-      sessionId?: string;
-    }): Promise<{
+    inputSchema: z.object({}),
+    handler: async (): Promise<{
       success: boolean;
       labels?: any[];
       total?: number;
       error?: string;
     }> => {
-      return await googleAPIService.listGmailLabels(
-        sessionId || env.GOOGLE_MCP_SESSION_ID
-      );
+      return await googleAPIService.listGmailLabels(env.GOOGLE_MCP_SESSION_ID);
     },
   },
 
   {
     name: "create_html_gmail_draft",
-    description: "Create a HTML Gmail draft",
+    description:
+      "Create a Gmail draft with HTML content and optional file attachments",
     inputSchema: z.object({
       to: z.string().describe("Recipient email address"),
-      subject: z.string().describe("Email subject"),
-      htmlBody: z.string().describe("HTML content of the email"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
+      subject: z.string().describe("Email subject line"),
+      htmlBody: z.string().describe("HTML content of the email body"),
       attachments: z
         .array(
           z.object({
-            filename: z.string(),
-            path: z.string(),
+            filename: z.string().describe("Name of the attachment file"),
+            path: z.string().describe("Local file path to the attachment"),
           })
         )
         .optional()
         .default([])
-        .describe("Array of attachments"),
+        .describe("Array of file attachments to include"),
     }),
     handler: async ({
       to,
       subject,
       htmlBody,
-      sessionId,
       attachments,
     }: {
       to: string;
       subject: string;
       htmlBody: string;
-      sessionId?: string;
       attachments?: { filename: string; path: string }[];
     }): Promise<{ success: boolean; draftId?: string; error?: string }> => {
       return await googleAPIService.createHtmlGmailDraft(
         to,
         subject,
         htmlBody,
-        sessionId || env.GOOGLE_MCP_SESSION_ID,
+        env.GOOGLE_MCP_SESSION_ID,
         attachments
       );
     },
@@ -115,17 +96,11 @@ export const gmailTools = [
     description: "Send a Gmail draft",
     inputSchema: z.object({
       draftId: z.string().describe("ID of the draft to send"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       draftId,
-      sessionId,
     }: {
       draftId: string;
-      sessionId?: string;
     }): Promise<{
       success: boolean;
       message?: string;
@@ -135,7 +110,7 @@ export const gmailTools = [
     }> => {
       return await googleAPIService.sendGmailDraft(
         draftId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -146,15 +121,11 @@ export const gmailTools = [
     inputSchema: z.object({
       messageId: z.string().describe("ID of the message to reply to"),
       replyText: z.string().describe("Text content of the reply"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
       attachments: z
         .array(
           z.object({
-            filename: z.string(),
-            path: z.string(),
+            filename: z.string().describe("Name of the attachment file"),
+            path: z.string().describe("Local file path to the attachment"),
           })
         )
         .optional()
@@ -164,12 +135,10 @@ export const gmailTools = [
     handler: async ({
       messageId,
       replyText,
-      sessionId,
       attachments,
     }: {
       messageId: string;
       replyText: string;
-      sessionId?: string;
       attachments?: { filename: string; path: string }[];
     }): Promise<{
       success: boolean;
@@ -182,7 +151,7 @@ export const gmailTools = [
       return await googleAPIService.replyToGmailMessage(
         messageId,
         replyText,
-        sessionId || env.GOOGLE_MCP_SESSION_ID,
+        env.GOOGLE_MCP_SESSION_ID,
         attachments
       );
     },
@@ -193,21 +162,15 @@ export const gmailTools = [
     description: "Get a Gmail message",
     inputSchema: z.object({
       messageId: z.string().describe("ID of the message to get"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       messageId,
-      sessionId,
     }: {
       messageId: string;
-      sessionId?: string;
     }): Promise<{ success: boolean; message?: any; error?: string }> => {
       return await googleAPIService.getGmailMessage(
         messageId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -217,21 +180,15 @@ export const gmailTools = [
     description: "Get a Gmail message thread",
     inputSchema: z.object({
       threadId: z.string().describe("ID of the thread to get"),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       threadId,
-      sessionId,
     }: {
       threadId: string;
-      sessionId?: string;
     }): Promise<{ success: boolean; thread?: any; error?: string }> => {
       return await googleAPIService.getGmailMessageThread(
         threadId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },

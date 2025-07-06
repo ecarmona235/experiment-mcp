@@ -8,21 +8,11 @@ export const sheetsTools = [
     description: "Get a Google Sheet by ID.",
     inputSchema: z.object({
       sheetId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      sheetId,
-      sessionId,
-    }: {
-      sheetId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ sheetId }: { sheetId: string }) => {
       return await googleAPIService.getGoogleSheet(
         sheetId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -31,21 +21,11 @@ export const sheetsTools = [
     description: "Create a new Google Sheet.",
     inputSchema: z.object({
       sheet: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      sheet,
-      sessionId,
-    }: {
-      sheet: any;
-      sessionId?: string;
-    }) => {
+    handler: async ({ sheet }: { sheet: any }) => {
       return await googleAPIService.createGoogleSheet(
         sheet,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -55,40 +35,27 @@ export const sheetsTools = [
     inputSchema: z.object({
       sheetId: z.string(),
       requests: z.array(z.any()),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       sheetId,
       requests,
-      sessionId,
     }: {
       sheetId: string;
       requests: any[];
-      sessionId?: string;
     }) => {
       return await googleAPIService.updateGoogleSheet(
         sheetId,
         requests,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "list_google_sheets",
     description: "List all Google Sheets.",
-    inputSchema: z.object({
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
-    }),
-    handler: async ({ sessionId }: { sessionId?: string }) => {
-      return await googleAPIService.listGoogleSheets(
-        sessionId || env.GOOGLE_MCP_SESSION_ID
-      );
+    inputSchema: z.object({}),
+    handler: async () => {
+      return await googleAPIService.listGoogleSheets(env.GOOGLE_MCP_SESSION_ID);
     },
   },
   {
@@ -96,21 +63,11 @@ export const sheetsTools = [
     description: "Delete a Google Sheet by ID.",
     inputSchema: z.object({
       sheetId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      sheetId,
-      sessionId,
-    }: {
-      sheetId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ sheetId }: { sheetId: string }) => {
       return await googleAPIService.deleteGoogleSheet(
         sheetId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },

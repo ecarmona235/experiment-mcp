@@ -8,21 +8,11 @@ export const docsTools = [
     description: "Get a Google Doc by ID.",
     inputSchema: z.object({
       docId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      docId,
-      sessionId,
-    }: {
-      docId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ docId }: { docId: string }) => {
       return await googleAPIService.getGoogleDoc(
         docId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -31,15 +21,11 @@ export const docsTools = [
     description: "Create a new Google Doc.",
     inputSchema: z.object({
       doc: z.any(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({ doc, sessionId }: { doc: any; sessionId?: string }) => {
+    handler: async ({ doc }: { doc: any }) => {
       return await googleAPIService.createGoogleDoc(
         doc,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
@@ -49,40 +35,27 @@ export const docsTools = [
     inputSchema: z.object({
       docId: z.string(),
       requests: z.array(z.any()),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
     handler: async ({
       docId,
       requests,
-      sessionId,
     }: {
       docId: string;
       requests: any[];
-      sessionId?: string;
     }) => {
       return await googleAPIService.updateGoogleDoc(
         docId,
         requests,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
   {
     name: "list_google_docs",
     description: "List all Google Docs.",
-    inputSchema: z.object({
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
-    }),
-    handler: async ({ sessionId }: { sessionId?: string }) => {
-      return await googleAPIService.listGoogleDocs(
-        sessionId || env.GOOGLE_MCP_SESSION_ID
-      );
+    inputSchema: z.object({}),
+    handler: async () => {
+      return await googleAPIService.listGoogleDocs(env.GOOGLE_MCP_SESSION_ID);
     },
   },
   {
@@ -90,21 +63,11 @@ export const docsTools = [
     description: "Delete a Google Doc by ID.",
     inputSchema: z.object({
       docId: z.string(),
-      sessionId: z
-        .string()
-        .optional()
-        .describe("Session ID for authentication"),
     }),
-    handler: async ({
-      docId,
-      sessionId,
-    }: {
-      docId: string;
-      sessionId?: string;
-    }) => {
+    handler: async ({ docId }: { docId: string }) => {
       return await googleAPIService.deleteGoogleDoc(
         docId,
-        sessionId || env.GOOGLE_MCP_SESSION_ID
+        env.GOOGLE_MCP_SESSION_ID
       );
     },
   },
