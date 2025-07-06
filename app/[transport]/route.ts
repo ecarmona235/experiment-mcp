@@ -3,7 +3,14 @@ import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
 import { createAuthResource } from "@/app/resources";
-import { gmailTools, calendarTools, driveTools } from "@/app/tools";
+import {
+  gmailTools,
+  calendarTools,
+  driveTools,
+  docsTools,
+  sheetsTools,
+  slidesTools,
+} from "@/app/tools";
 
 export const maxDuration = 800;
 
@@ -61,18 +68,86 @@ const handler = createMcpHandler(server => {
 
   // Register drive tools
   driveTools.forEach(tool => {
-    server.tool(tool.name, tool.description, tool.inputSchema.shape, async (args: any) => {
-      const result = await tool.handler(args);
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    });
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.inputSchema.shape,
+      async (args: any) => {
+        const result = await tool.handler(args);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
     logger.info("Drive tool registered", { name: tool.name });
+  });
+
+  // Register docs tools
+  docsTools.forEach(tool => {
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.inputSchema.shape,
+      async (args: any) => {
+        const result = await tool.handler(args);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+    logger.info("Docs tool registered", { name: tool.name });
+  });
+
+  // Register sheets tools
+  sheetsTools.forEach(tool => {
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.inputSchema.shape,
+      async (args: any) => {
+        const result = await tool.handler(args);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+    logger.info("Sheets tool registered", { name: tool.name });
+  });
+
+  // Register slides tools
+  slidesTools.forEach(tool => {
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.inputSchema.shape,
+      async (args: any) => {
+        const result = await tool.handler(args);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+    logger.info("Slides tool registered", { name: tool.name });
   });
 });
 
