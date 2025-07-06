@@ -4,7 +4,7 @@ import { env } from "@/app/config/env";
 
 export const calendarTools = [
   {
-    name: "listCalendarEvents",
+    name: "list_calendar_events",
     description: "List events on a Google Calendar within a time range.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -39,7 +39,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "createCalendarEvent",
+    name: "create_calendar_event",
     description: "Create a new event on a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -66,7 +66,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "updateCalendarEvent",
+    name: "update_calendar_event",
     description: "Update an existing event on a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -97,7 +97,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "deleteCalendarEvent",
+    name: "delete_calendar_event",
     description: "Delete an existing event on a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -124,7 +124,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "getCalendar",
+    name: "get_calendar",
     description: "Get a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -147,11 +147,11 @@ export const calendarTools = [
     },
   },
   {
-    name: "updateCalendar",
+    name: "update_calendar",
     description: "Update a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
-      calendar: z.any(), 
+      calendar: z.any(),
       sessionId: z
         .string()
         .optional()
@@ -174,7 +174,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "deleteCalendar",
+    name: "delete_calendar",
     description: "Delete a Google Calendar.",
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
@@ -197,7 +197,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "createCalendar",
+    name: "create_calendar",
     description: "Create a Google Calendar.",
     inputSchema: z.object({
       calendar: z.any(),
@@ -220,7 +220,7 @@ export const calendarTools = [
     },
   },
   {
-    name: "listCalendars",
+    name: "list_calendars",
     description: "List all Google Calendars.",
     inputSchema: z.object({
       sessionId: z

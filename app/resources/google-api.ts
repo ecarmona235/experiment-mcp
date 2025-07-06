@@ -924,6 +924,33 @@ export class GoogleAPIService {
     }
   }
 
+  async listGoogleCalendars(
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; calendars?: any[]; error?: string }> {
+    logger.info("Listing Google calendars");
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const calendar = google.calendar({ version: "v3", auth });
+      const response = await calendar.calendarList.list();
+      const calendars = response.data.items || [];
+      logger.info("Google calendars retrieved successfully", {
+        count: calendars.length,
+      });
+      return {
+        success: true,
+        calendars,
+      };
+    } catch (error) {
+      logger.error("Error listing Google calendars", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
   // ================================
   // Google Drive API
   // ================================

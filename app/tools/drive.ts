@@ -4,7 +4,7 @@ import { env } from "@/app/config/env";
 
 export const driveTools = [
   {
-    name: "listGoogleDriveFiles",
+    name: "list_google_drive_files",
     description: "List files in Google Drive.",
     inputSchema: z.object({
       sessionId: z.string().default("default"),
@@ -16,7 +16,7 @@ export const driveTools = [
     },
   },
   {
-    name: "getGoogleDriveFile",
+    name: "get_google_drive_file",
     description: "Get a file from Google Drive by fileId.",
     inputSchema: z.object({
       fileId: z.string(),
@@ -36,7 +36,7 @@ export const driveTools = [
     },
   },
   {
-    name: "createGoogleDriveFile",
+    name: "create_google_drive_file",
     description: "Create a file in Google Drive (metadata only, no content).",
     inputSchema: z.object({
       file: z.any(),
@@ -50,7 +50,7 @@ export const driveTools = [
     },
   },
   {
-    name: "uploadGoogleDriveFile",
+    name: "upload_google_drive_file",
     description:
       "Upload a file from disk to Google Drive (with content and metadata).",
     inputSchema: z.object({
@@ -75,7 +75,7 @@ export const driveTools = [
     },
   },
   {
-    name: "downloadGoogleDriveFile",
+    name: "download_google_drive_file",
     description: "Download a file from Google Drive to disk.",
     inputSchema: z.object({
       fileId: z.string().describe("ID of the file in Google Drive"),
@@ -99,7 +99,7 @@ export const driveTools = [
     },
   },
   {
-    name: "deleteGoogleDriveFile",
+    name: "delete_google_drive_file",
     description: "Delete a file from Google Drive by fileId.",
     inputSchema: z.object({
       fileId: z.string(),
