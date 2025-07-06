@@ -100,7 +100,7 @@ export class GoogleAPIService {
   // Authentication
   // ================================
   private async getAuthenticatedClient(sessionId: string) {
-    logger.info("Getting authenticated client", { sessionId });
+    logger.info("Getting authenticated client");
     try {
       if (sessionId === "default") {
         sessionId = env.GOOGLE_MCP_SESSION_ID;
@@ -109,7 +109,7 @@ export class GoogleAPIService {
       const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
 
       if (!tokensJson) {
-        logger.error("No authentication tokens found", { sessionId });
+        logger.error("No authentication tokens found");
         throw new Error(
           "No authentication tokens found. Please authenticate first."
         );
@@ -174,7 +174,6 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error getting user profile", {
-        sessionId,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -300,7 +299,6 @@ export class GoogleAPIService {
     logger.info("Creating HTML Gmail draft", {
       to,
       subject,
-      sessionId,
       htmlBodyLength: htmlBody.length,
       hasAttachments: attachments.length > 0,
       attachmentCount: attachments.length,
@@ -337,7 +335,6 @@ export class GoogleAPIService {
       });
 
       logger.info("Gmail draft created successfully", {
-        sessionId,
         draftId: res.data.id,
         messageId: res.data.message?.id,
         threadId: res.data.message?.threadId,
@@ -351,7 +348,6 @@ export class GoogleAPIService {
       logger.error("Error creating Gmail draft", {
         to,
         subject,
-        sessionId,
         attachmentsCount: attachments.length,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
@@ -374,7 +370,6 @@ export class GoogleAPIService {
     error?: string;
   }> {
     logger.info("Sending Gmail draft", {
-      sessionId,
       draftId,
     });
 
@@ -390,12 +385,7 @@ export class GoogleAPIService {
         },
       });
 
-      logger.info("Gmail draft sent successfully", {
-        sessionId,
-        draftId,
-        messageId: res.data.id,
-        threadId: res.data.threadId,
-      });
+      logger.info("Gmail draft sent successfully");
 
       return {
         success: true,
@@ -405,7 +395,6 @@ export class GoogleAPIService {
       };
     } catch (error) {
       logger.error("Error sending Gmail draft", {
-        sessionId,
         draftId,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
@@ -602,7 +591,7 @@ export class GoogleAPIService {
     threadId: string,
     sessionId: string = "default"
   ): Promise<{ success: boolean; thread?: any; error?: string }> {
-    logger.info("Getting Gmail message thread", { threadId, sessionId });
+    logger.info("Getting Gmail message thread", { threadId });
 
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
@@ -615,7 +604,6 @@ export class GoogleAPIService {
 
       logger.info("Gmail message thread retrieved successfully", {
         threadId,
-        sessionId,
         thread: response.data,
       });
 
@@ -626,7 +614,6 @@ export class GoogleAPIService {
     } catch (error) {
       logger.error("Error getting Gmail message thread", {
         threadId,
-        sessionId,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -822,7 +809,7 @@ export class GoogleAPIService {
     calendarId: string = "primary",
     sessionId: string = "default"
   ): Promise<{ success: boolean; calendar?: any; error?: string }> {
-    logger.info("Getting Google calendar", { calendarId, sessionId });
+    logger.info("Getting Google calendar", { calendarId });
 
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
@@ -937,23 +924,186 @@ export class GoogleAPIService {
     }
   }
 
-  async listGoogleCalendars(
+  // ================================
+  // Google Drive API
+  // ================================
+  async listGoogleDriveFiles(
     sessionId: string = "default"
-  ): Promise<{ success: boolean; calendars?: any[]; error?: string }> {
-    logger.info("Listing Google calendars");
+  ): Promise<{ success: boolean; files?: any[]; error?: string }> {
+    logger.info("Listing Google Drive files");
     try {
-      logger.info("Getting authenticated client", { sessionId });
       const auth = await this.getAuthenticatedClient(sessionId);
-      const calendarService = google.calendar({ version: "v3", auth });
+      const drive = google.drive({ version: "v3", auth });
 
-      const response = await calendarService.calendarList.list({});
+      const response = await drive.files.list();
+      const files = response.data.files || [];
+
+      logger.info("Google Drive files retrieved successfully", {
+        count: files.length,
+      });
 
       return {
         success: true,
-        calendars: response.data.items,
+        files,
       };
     } catch (error) {
-      logger.error("Error listing Google calendars", {
+      logger.error("Error listing Google Drive files", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getGoogleDriveFile(
+    fileId: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; file?: any; error?: string }> {
+    logger.info("Getting Google Drive file", { fileId });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const drive = google.drive({ version: "v3", auth });
+
+      const response = await drive.files.get({ fileId });
+
+      return {
+        success: true,
+        file: response.data,
+      };
+    } catch (error) {
+      logger.error("Error getting Google Drive file", {
+        fileId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async createGoogleDriveFile(
+    file: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; file?: any; error?: string }> {
+    logger.info("Creating Google Drive file", { file });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const drive = google.drive({ version: "v3", auth });
+
+      const response = await drive.files.create({ requestBody: file });
+
+      return {
+        success: true,
+        file: response.data,
+      };
+    } catch (error) {
+      logger.error("Error creating Google Drive file", {
+        file,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async deleteGoogleDriveFile(
+    fileId: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; error?: string }> {
+    logger.info("Deleting Google Drive file", { fileId });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const drive = google.drive({ version: "v3", auth });
+
+      await drive.files.delete({ fileId });
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      logger.error("Error deleting Google Drive file", {
+        fileId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async uploadGoogleDriveFile(
+    filePath: string,
+    metadata: any,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; file?: any; error?: string }> {
+    logger.info("Uploading Google Drive file", { filePath, metadata });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const drive = google.drive({ version: "v3", auth });
+      const mimeType =
+        mimeLookup.getType(filePath) || "application/octet-stream";
+      const fileMetadata = metadata; // e.g., { name: "myfile.txt", parents: ["folderId"] }
+      const media = {
+        mimeType,
+        body: fs.createReadStream(filePath),
+      };
+      const response = await drive.files.create({
+        requestBody: fileMetadata,
+        media,
+        fields: "id, name, mimeType, parents",
+      });
+      logger.info("Google Drive file uploaded successfully", {
+        id: response.data.id,
+      });
+      return {
+        success: true,
+        file: response.data,
+      };
+    } catch (error) {
+      logger.error("Error uploading Google Drive file", {
+        filePath,
+        metadata,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async downloadGoogleDriveFile(
+    fileId: string,
+    destinationPath: string,
+    sessionId: string = "default"
+  ): Promise<{ success: boolean; error?: string }> {
+    logger.info("Downloading Google Drive file", { fileId, destinationPath });
+    try {
+      const auth = await this.getAuthenticatedClient(sessionId);
+      const drive = google.drive({ version: "v3", auth });
+      const dest = fs.createWriteStream(destinationPath);
+      const res = await drive.files.get(
+        { fileId, alt: "media" },
+        { responseType: "stream" }
+      );
+      await new Promise((resolve, reject) => {
+        res.data.on("end", resolve).on("error", reject).pipe(dest);
+      });
+      logger.info("Google Drive file downloaded successfully", {
+        fileId,
+        destinationPath,
+      });
+      return { success: true };
+    } catch (error) {
+      logger.error("Error downloading Google Drive file", {
+        fileId,
+        destinationPath,
         error: error instanceof Error ? error.message : "Unknown error",
       });
       return {

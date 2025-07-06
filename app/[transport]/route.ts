@@ -3,7 +3,7 @@ import { z } from "zod";
 import { env } from "@/app/config/env";
 import { Logger } from "@/app/utils/logger";
 import { createAuthResource } from "@/app/resources";
-import { gmailTools, calendarTools } from "@/app/tools";
+import { gmailTools, calendarTools, driveTools } from "@/app/tools";
 
 export const maxDuration = 800;
 
@@ -57,6 +57,22 @@ const handler = createMcpHandler(server => {
       }
     );
     logger.info("Calendar tool registered", { name: tool.name });
+  });
+
+  // Register drive tools
+  driveTools.forEach(tool => {
+    server.tool(tool.name, tool.description, tool.inputSchema.shape, async (args: any) => {
+      const result = await tool.handler(args);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    });
+    logger.info("Drive tool registered", { name: tool.name });
   });
 });
 

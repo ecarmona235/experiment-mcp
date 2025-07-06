@@ -41,13 +41,13 @@ export function createAuthResource() {
             ],
           };
         }
-        logger.info("Session ID found", { sessionId });
+        logger.info("Session ID found");
         const tokens = await getTokens(sessionId);
 
         let authData: any;
 
         if (!tokens) {
-          logger.warn("No authentication tokens found", { sessionId });
+          logger.warn("No authentication tokens found");
           authData = {
             authenticated: false,
             message:
