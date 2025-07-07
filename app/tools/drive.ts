@@ -7,8 +7,21 @@ export const driveTools = [
     name: "list_google_drive_files",
     description:
       "List files and folders in your Google Drive (returns file metadata, not content)",
-    inputSchema: z.object({}),
-    handler: async () => {
+    inputSchema: z.object({
+      random_string: z
+        .string()
+        .optional()
+        .describe("Optional parameter to ensure tool can be called"),
+    }),
+    handler: async ({
+      random_string,
+    }: {
+      random_string?: string;
+    }): Promise<{
+      success: boolean;
+      files?: any[];
+      error?: string;
+    }> => {
       return await googleAPIService.listGoogleDriveFiles(
         env.GOOGLE_MCP_SESSION_ID
       );
@@ -20,7 +33,11 @@ export const driveTools = [
     inputSchema: z.object({
       fileId: z.string(),
     }),
-    handler: async ({ fileId }: { fileId: string }) => {
+    handler: async ({
+      fileId,
+    }: {
+      fileId: string;
+    }): Promise<{ success: boolean; file?: any; error?: string }> => {
       return await googleAPIService.getGoogleDriveFile(
         fileId,
         env.GOOGLE_MCP_SESSION_ID
@@ -38,7 +55,11 @@ export const driveTools = [
           "File metadata object with properties like name, mimeType, parents"
         ),
     }),
-    handler: async ({ file }: { file: any }) => {
+    handler: async ({
+      file,
+    }: {
+      file: any;
+    }): Promise<{ success: boolean; file?: any; error?: string }> => {
       return await googleAPIService.createGoogleDriveFile(
         file,
         env.GOOGLE_MCP_SESSION_ID
@@ -59,7 +80,7 @@ export const driveTools = [
     }: {
       filePath: string;
       metadata: any;
-    }) => {
+    }): Promise<{ success: boolean; file?: any; error?: string }> => {
       return await googleAPIService.uploadGoogleDriveFile(
         filePath,
         metadata,
@@ -80,7 +101,7 @@ export const driveTools = [
     }: {
       fileId: string;
       destinationPath: string;
-    }) => {
+    }): Promise<{ success: boolean; error?: string }> => {
       return await googleAPIService.downloadGoogleDriveFile(
         fileId,
         destinationPath,
@@ -94,7 +115,11 @@ export const driveTools = [
     inputSchema: z.object({
       fileId: z.string(),
     }),
-    handler: async ({ fileId }: { fileId: string }) => {
+    handler: async ({
+      fileId,
+    }: {
+      fileId: string;
+    }): Promise<{ success: boolean; error?: string }> => {
       return await googleAPIService.deleteGoogleDriveFile(
         fileId,
         env.GOOGLE_MCP_SESSION_ID

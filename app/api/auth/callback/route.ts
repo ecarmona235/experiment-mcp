@@ -15,13 +15,14 @@ function generateSessionId(): string {
 }
 
 export async function GET(request: NextRequest) {
-  // Redirect to HTTPS if not already
-  const proto = request.headers.get("x-forwarded-proto");
-  if (proto && proto !== "https") {
-    const url = new URL(request.url);
-    url.protocol = "https:";
-    return NextResponse.redirect(url.toString(), 307);
-  }
+  // Redirect to HTTPS if not already 
+  // useful if not running on localhost
+  // const proto = request.headers.get("x-forwarded-proto");
+  // if (proto && proto !== "https") {
+  //   const url = new URL(request.url);
+  //   url.protocol = "https:";
+  //   return NextResponse.redirect(url.toString(), 307);
+  // }
 
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");

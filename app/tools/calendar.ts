@@ -37,7 +37,7 @@ export const calendarTools = [
       timeMin?: string;
       timeMax?: string;
       maxResults?: number;
-    }) => {
+    }): Promise<{ success: boolean; events?: any[]; error?: string }> => {
       return await googleAPIService.listCalendarEvents(
         calendarId,
         timeMin,
@@ -68,7 +68,7 @@ export const calendarTools = [
     }: {
       calendarId?: string;
       event?: any;
-    }) => {
+    }): Promise<{ success: boolean; event?: any; error?: string }> => {
       return await googleAPIService.createGoogleCalendarEvent(
         calendarId,
         event,
@@ -92,7 +92,7 @@ export const calendarTools = [
       calendarId: string;
       eventId: string;
       event?: any;
-    }) => {
+    }): Promise<{ success: boolean; event?: any; error?: string }> => {
       return await googleAPIService.updateGoogleCalendarEvent(
         calendarId,
         eventId,
@@ -114,7 +114,7 @@ export const calendarTools = [
     }: {
       calendarId?: string;
       eventId: string;
-    }) => {
+    }): Promise<{ success: boolean; error?: string }> => {
       return await googleAPIService.deleteGoogleCalendarEvent(
         calendarId,
         eventId,
@@ -128,7 +128,11 @@ export const calendarTools = [
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
     }),
-    handler: async ({ calendarId }: { calendarId?: string }) => {
+    handler: async ({
+      calendarId,
+    }: {
+      calendarId?: string;
+    }): Promise<{ success: boolean; calendar?: any; error?: string }> => {
       return await googleAPIService.getGoogleCalendar(
         calendarId,
         env.GOOGLE_MCP_SESSION_ID
@@ -148,7 +152,7 @@ export const calendarTools = [
     }: {
       calendarId?: string;
       calendar?: any;
-    }) => {
+    }): Promise<{ success: boolean; calendar?: any; error?: string }> => {
       return await googleAPIService.updateGoogleCalendar(
         calendarId,
         calendar,
@@ -162,7 +166,11 @@ export const calendarTools = [
     inputSchema: z.object({
       calendarId: z.string().default("primary"),
     }),
-    handler: async ({ calendarId }: { calendarId?: string }) => {
+    handler: async ({
+      calendarId,
+    }: {
+      calendarId?: string;
+    }): Promise<{ success: boolean; error?: string }> => {
       return await googleAPIService.deleteGoogleCalendar(
         calendarId,
         env.GOOGLE_MCP_SESSION_ID
@@ -175,7 +183,11 @@ export const calendarTools = [
     inputSchema: z.object({
       calendar: z.any(),
     }),
-    handler: async ({ calendar }: { calendar?: any }) => {
+    handler: async ({
+      calendar,
+    }: {
+      calendar?: any;
+    }): Promise<{ success: boolean; calendar?: any; error?: string }> => {
       return await googleAPIService.createGoogleCalendar(
         calendar,
         env.GOOGLE_MCP_SESSION_ID
@@ -185,8 +197,21 @@ export const calendarTools = [
   {
     name: "list_calendars",
     description: "List all Google Calendars.",
-    inputSchema: z.object({}),
-    handler: async () => {
+    inputSchema: z.object({
+      random_string: z
+        .string()
+        .optional()
+        .describe("Optional parameter to ensure tool can be called"),
+    }),
+    handler: async ({
+      random_string,
+    }: {
+      random_string?: string;
+    }): Promise<{
+      success: boolean;
+      calendars?: any[];
+      error?: string;
+    }> => {
       return await googleAPIService.listGoogleCalendars(
         env.GOOGLE_MCP_SESSION_ID
       );

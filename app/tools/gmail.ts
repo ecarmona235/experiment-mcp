@@ -40,8 +40,17 @@ export const gmailTools = [
   {
     name: "list_gmail_labels",
     description: "List Gmail labels",
-    inputSchema: z.object({}),
-    handler: async (): Promise<{
+    inputSchema: z.object({
+      random_string: z
+        .string()
+        .optional()
+        .describe("Optional parameter to ensure tool can be called"),
+    }),
+    handler: async ({
+      random_string,
+    }: {
+      random_string?: string;
+    }): Promise<{
       success: boolean;
       labels?: any[];
       total?: number;

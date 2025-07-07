@@ -14,7 +14,7 @@ import {
 
 export const maxDuration = 800;
 
-const logger = new Logger("MCP:Experiment");
+const logger = new Logger("Google Workspace MCP");
 
 const handler = createMcpHandler(server => {
   logger.info("Initializing MCP handler");
@@ -30,10 +30,12 @@ const handler = createMcpHandler(server => {
       server.tool(
         tool.name,
         tool.description,
-        tool.inputSchema,
+        tool.inputSchema.shape,
         async (args: any) => {
           try {
-            const result = await tool.handler(args);
+            // Validate input using the Zod schema
+            const validatedArgs = tool.inputSchema.parse(args);
+            const result = await tool.handler(validatedArgs);
             return {
               content: [
                 {
@@ -75,12 +77,12 @@ const handler = createMcpHandler(server => {
   registerTools(gmailTools, "Gmail");
   registerTools(calendarTools, "Calendar");
   registerTools(driveTools, "Drive");
-  registerTools(docsTools, "Docs");
-  registerTools(sheetsTools, "Sheets");
-  registerTools(slidesTools, "Slides");
+  // registerTools(docsTools, "Docs");
+  // registerTools(sheetsTools, "Sheets");
+  // registerTools(slidesTools, "Slides");
 });
 
-logger.info("MCP experiment handler created successfully", {
+logger.info("Google Workspace MCP handler created successfully", {
   redisUrl: !!env.REDIS_URL,
   verboseLogs: true,
   maxDuration: 60,

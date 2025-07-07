@@ -1342,26 +1342,26 @@ export class GoogleAPIService {
 
   // Update a Google Doc (batchUpdate)
   async updateGoogleDoc(
-    docId: string,
+    documentId: string,
     requests: any[],
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; response?: any; error?: string }> {
-    logger.info("Updating Google Doc", { docId, requests });
+    sessionId: string
+  ) {
+    logger.info("Updating Google Doc", { documentId, requests });
     try {
       const auth = await this.getAuthenticatedClient(sessionId);
       const docsApi = google.docs({ version: "v1", auth });
       const response = await docsApi.documents.batchUpdate({
-        documentId: docId,
+        documentId,
         requestBody: { requests },
       });
-      logger.info("Google Doc updated successfully", { docId });
+      logger.info("Google Doc updated successfully", { documentId });
       return {
         success: true,
         response: response.data,
       };
     } catch (error) {
       logger.error("Error updating Google Doc", {
-        docId,
+        documentId,
         requests,
         error: error instanceof Error ? error.message : "Unknown error",
       });

@@ -7,11 +7,15 @@ export const sheetsTools = [
     name: "get_google_sheet",
     description: "Get a Google Sheet by ID.",
     inputSchema: z.object({
-      sheetId: z.string(),
+      spreadsheetId: z.string(),
     }),
-    handler: async ({ sheetId }: { sheetId: string }) => {
+    handler: async ({
+      spreadsheetId,
+    }: {
+      spreadsheetId: string;
+    }): Promise<{ success: boolean; sheet?: any; error?: string }> => {
       return await googleAPIService.getGoogleSheet(
-        sheetId,
+        spreadsheetId,
         env.GOOGLE_MCP_SESSION_ID
       );
     },
@@ -22,7 +26,11 @@ export const sheetsTools = [
     inputSchema: z.object({
       sheet: z.any(),
     }),
-    handler: async ({ sheet }: { sheet: any }) => {
+    handler: async ({
+      sheet,
+    }: {
+      sheet: any;
+    }): Promise<{ success: boolean; sheet?: any; error?: string }> => {
       return await googleAPIService.createGoogleSheet(
         sheet,
         env.GOOGLE_MCP_SESSION_ID
@@ -33,18 +41,18 @@ export const sheetsTools = [
     name: "update_google_sheet",
     description: "Update a Google Sheet using batchUpdate requests.",
     inputSchema: z.object({
-      sheetId: z.string(),
+      spreadsheetId: z.string(),
       requests: z.array(z.any()),
     }),
     handler: async ({
-      sheetId,
+      spreadsheetId,
       requests,
     }: {
-      sheetId: string;
+      spreadsheetId: string;
       requests: any[];
-    }) => {
+    }): Promise<{ success: boolean; response?: any; error?: string }> => {
       return await googleAPIService.updateGoogleSheet(
-        sheetId,
+        spreadsheetId,
         requests,
         env.GOOGLE_MCP_SESSION_ID
       );
@@ -53,8 +61,21 @@ export const sheetsTools = [
   {
     name: "list_google_sheets",
     description: "List all Google Sheets.",
-    inputSchema: z.object({}),
-    handler: async () => {
+    inputSchema: z.object({
+      random_string: z
+        .string()
+        .optional()
+        .describe("Optional parameter to ensure tool can be called"),
+    }),
+    handler: async ({
+      random_string,
+    }: {
+      random_string?: string;
+    }): Promise<{
+      success: boolean;
+      sheets?: any[];
+      error?: string;
+    }> => {
       return await googleAPIService.listGoogleSheets(env.GOOGLE_MCP_SESSION_ID);
     },
   },
@@ -62,11 +83,15 @@ export const sheetsTools = [
     name: "delete_google_sheet",
     description: "Delete a Google Sheet by ID.",
     inputSchema: z.object({
-      sheetId: z.string(),
+      spreadsheetId: z.string(),
     }),
-    handler: async ({ sheetId }: { sheetId: string }) => {
+    handler: async ({
+      spreadsheetId,
+    }: {
+      spreadsheetId: string;
+    }): Promise<{ success: boolean; error?: string }> => {
       return await googleAPIService.deleteGoogleSheet(
-        sheetId,
+        spreadsheetId,
         env.GOOGLE_MCP_SESSION_ID
       );
     },
