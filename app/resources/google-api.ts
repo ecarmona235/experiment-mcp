@@ -1206,77 +1206,77 @@ export class GoogleAPIService {
     }
   }
 
-  // Create a Google Sheet (valid)
-  async createGoogleSheet(
-    sheet: any,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; sheet?: any; error?: string }> {
-    logger.info("Creating Google Sheet", { sheet });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const sheets = google.sheets({ version: "v4", auth });
-      const response = await sheets.spreadsheets.create({ requestBody: sheet });
-      const sheetData = response.data;
-      logger.info("Google Sheet created successfully", {
-        sheetId: sheetData.spreadsheetId,
-      });
-      return {
-        success: true,
-        sheet: sheetData,
-      };
-    } catch (error) {
-      logger.error("Error creating Google Sheet", {
-        sheet,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Create a Google Sheet (valid)
+  // async createGoogleSheet(
+  //   sheet: any,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; sheet?: any; error?: string }> {
+  //   logger.info("Creating Google Sheet", { sheet });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const sheets = google.sheets({ version: "v4", auth });
+  //     const response = await sheets.spreadsheets.create({ requestBody: sheet });
+  //     const sheetData = response.data;
+  //     logger.info("Google Sheet created successfully", {
+  //       sheetId: sheetData.spreadsheetId,
+  //     });
+  //     return {
+  //       success: true,
+  //       sheet: sheetData,
+  //     };
+  //   } catch (error) {
+  //     logger.error("Error creating Google Sheet", {
+  //       sheet,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
-  // Update a Google Sheet (use batchUpdate)
-  async updateGoogleSheet(
-    sheetId: string,
-    requests: any[],
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; response?: any; error?: string }> {
-    logger.info("Updating Google Sheet", { sheetId, requests });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const sheets = google.sheets({ version: "v4", auth });
-      const response = await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: sheetId,
-        requestBody: { requests },
-      });
-      logger.info("Google Sheet updated successfully", { sheetId });
-      return {
-        success: true,
-        response: response.data,
-      };
-    } catch (error) {
-      logger.error("Error updating Google Sheet", {
-        sheetId,
-        requests,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Update a Google Sheet (use batchUpdate)
+  // async updateGoogleSheet(
+  //   sheetId: string,
+  //   requests: any[],
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; response?: any; error?: string }> {
+  //   logger.info("Updating Google Sheet", { sheetId, requests });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const sheets = google.sheets({ version: "v4", auth });
+  //     const response = await sheets.spreadsheets.batchUpdate({
+  //       spreadsheetId: sheetId,
+  //       requestBody: { requests },
+  //     });
+  //     logger.info("Google Sheet updated successfully", { sheetId });
+  //     return {
+  //       success: true,
+  //       response: response.data,
+  //     };
+  //   } catch (error) {
+  //     logger.error("Error updating Google Sheet", {
+  //       sheetId,
+  //       requests,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
-  // Delete a Google Sheet using Drive API
-  async deleteGoogleSheet(
-    sheetId: string,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; error?: string }> {
-    logger.info("Deleting Google Sheet", { sheetId });
-    // Just call the general Drive file delete
-    return await this.deleteGoogleDriveFile(sheetId, sessionId);
-  }
+  // // Delete a Google Sheet using Drive API
+  // async deleteGoogleSheet(
+  //   sheetId: string,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; error?: string }> {
+  //   logger.info("Deleting Google Sheet", { sheetId });
+  //   // Just call the general Drive file delete
+  //   return await this.deleteGoogleDriveFile(sheetId, sessionId);
+  // }
 
   // ================================
   // Google Docs API
@@ -1310,69 +1310,69 @@ export class GoogleAPIService {
     }
   }
 
-  // Create a Google Doc
-  async createGoogleDoc(
-    doc: any,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; doc?: any; error?: string }> {
-    logger.info("Creating Google Doc", { doc });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const docsApi = google.docs({ version: "v1", auth });
-      const response = await docsApi.documents.create({ requestBody: doc });
-      const docData = response.data;
-      logger.info("Google Doc created successfully", {
-        docId: docData.documentId,
-      });
-      return {
-        success: true,
-        doc: docData,
-      };
-    } catch (error) {
-      logger.error("Error creating Google Doc", {
-        doc,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Create a Google Doc
+  // async createGoogleDoc(
+  //   doc: any,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; doc?: any; error?: string }> {
+  //   logger.info("Creating Google Doc", { doc });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const docsApi = google.docs({ version: "v1", auth });
+  //     const response = await docsApi.documents.create({ requestBody: doc });
+  //     const docData = response.data;
+  //     logger.info("Google Doc created successfully", {
+  //       docId: docData.documentId,
+  //     });
+  //     return {
+  //       success: true,
+  //       doc: docData,
+  //     };
+  //   } catch (error) {
+  //     logger.error("Error creating Google Doc", {
+  //       doc,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
-  // Update a Google Doc (batchUpdate)
-  async updateGoogleDoc(
-    documentId: string,
-    requests: any[],
-    sessionId: string
-  ) {
-    logger.info("Updating Google Doc", { documentId, requests });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const docsApi = google.docs({ version: "v1", auth });
-      const response = await docsApi.documents.batchUpdate({
-        documentId,
-        requestBody: { requests },
-      });
-      logger.info("Google Doc updated successfully", { documentId });
-      return {
-        success: true,
-        response: response.data,
-      };
-    } catch (error) {
-      logger.error("Error updating Google Doc", {
-        documentId,
-        requests,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Update a Google Doc (batchUpdate)
+  // async updateGoogleDoc(
+  //   documentId: string,
+  //   requests: any[],
+  //   sessionId: string
+  // ) {
+  //   logger.info("Updating Google Doc", { documentId, requests });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const docsApi = google.docs({ version: "v1", auth });
+  //     const response = await docsApi.documents.batchUpdate({
+  //       documentId,
+  //       requestBody: { requests },
+  //     });
+  //     logger.info("Google Doc updated successfully", { documentId });
+  //     return {
+  //       success: true,
+  //       response: response.data,
+  //     };
+  //   } catch (error) {
+  //     logger.error("Error updating Google Doc", {
+  //       documentId,
+  //       requests,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
-  // List Google Docs using Drive API
+  // // List Google Docs using Drive API
   async listGoogleDocs(
     sessionId: string = "default"
   ): Promise<{ success: boolean; docs?: any[]; error?: string }> {
@@ -1403,14 +1403,14 @@ export class GoogleAPIService {
     }
   }
 
-  // Delete a Google Doc using Drive API
-  async deleteGoogleDoc(
-    docId: string,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; error?: string }> {
-    logger.info("Deleting Google Doc", { docId });
-    return await this.deleteGoogleDriveFile(docId, sessionId);
-  }
+  // // Delete a Google Doc using Drive API
+  // async deleteGoogleDoc(
+  //   docId: string,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; error?: string }> {
+  //   logger.info("Deleting Google Doc", { docId });
+  //   return await this.deleteGoogleDriveFile(docId, sessionId);
+  // }
 
   // ================================
   // Google Slides API
@@ -1446,69 +1446,69 @@ export class GoogleAPIService {
     }
   }
 
-  // Create a Google Slide
-  async createGoogleSlide(
-    slide: any,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; slide?: any; error?: string }> {
-    logger.info("Creating Google Slide", { slide });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const slidesApi = google.slides({ version: "v1", auth });
-      const response = await slidesApi.presentations.create({
-        requestBody: slide,
-      });
-      const slideData = response.data;
-      logger.info("Google Slide created successfully", {
-        slideId: slideData.presentationId,
-      });
-      return {
-        success: true,
-        slide: slideData,
-      };
-    } catch (error: any) {
-      logger.error("Error creating Google Slide", {
-        slide,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Create a Google Slide
+  // async createGoogleSlide(
+  //   slide: any,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; slide?: any; error?: string }> {
+  //   logger.info("Creating Google Slide", { slide });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const slidesApi = google.slides({ version: "v1", auth });
+  //     const response = await slidesApi.presentations.create({
+  //       requestBody: slide,
+  //     });
+  //     const slideData = response.data;
+  //     logger.info("Google Slide created successfully", {
+  //       slideId: slideData.presentationId,
+  //     });
+  //     return {
+  //       success: true,
+  //       slide: slideData,
+  //     };
+  //   } catch (error: any) {
+  //     logger.error("Error creating Google Slide", {
+  //       slide,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
-  // Update a Google Slide (batchUpdate)
-  async updateGoogleSlide(
-    slideId: string,
-    requests: any[],
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; response?: any; error?: string }> {
-    logger.info("Updating Google Slide", { slideId, requests });
-    try {
-      const auth = await this.getAuthenticatedClient(sessionId);
-      const slidesApi = google.slides({ version: "v1", auth });
-      const response = await slidesApi.presentations.batchUpdate({
-        presentationId: slideId,
-        requestBody: { requests },
-      });
-      logger.info("Google Slide updated successfully", { slideId });
-      return {
-        success: true,
-        response: response.data,
-      };
-    } catch (error: any) {
-      logger.error("Error updating Google Slide", {
-        slideId,
-        requests,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  }
+  // // Update a Google Slide (batchUpdate)
+  // async updateGoogleSlide(
+  //   slideId: string,
+  //   requests: any[],
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; response?: any; error?: string }> {
+  //   logger.info("Updating Google Slide", { slideId, requests });
+  //   try {
+  //     const auth = await this.getAuthenticatedClient(sessionId);
+  //     const slidesApi = google.slides({ version: "v1", auth });
+  //     const response = await slidesApi.presentations.batchUpdate({
+  //       presentationId: slideId,
+  //       requestBody: { requests },
+  //     });
+  //     logger.info("Google Slide updated successfully", { slideId });
+  //     return {
+  //       success: true,
+  //       response: response.data,
+  //     };
+  //   } catch (error: any) {
+  //     logger.error("Error updating Google Slide", {
+  //       slideId,
+  //       requests,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //     return {
+  //       success: false,
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     };
+  //   }
+  // }
 
   // List Google Slides using Drive API (DRY: delegate to listGoogleDriveFiles)
   async listGoogleSlides(
@@ -1542,14 +1542,14 @@ export class GoogleAPIService {
     }
   }
 
-  // Delete a Google Slide using Drive API (DRY: delegate to deleteGoogleDriveFile)
-  async deleteGoogleSlide(
-    slideId: string,
-    sessionId: string = "default"
-  ): Promise<{ success: boolean; error?: string }> {
-    logger.info("Deleting Google Slide", { slideId });
-    return await this.deleteGoogleDriveFile(slideId, sessionId);
-  }
+  // // Delete a Google Slide using Drive API (DRY: delegate to deleteGoogleDriveFile)
+  // async deleteGoogleSlide(
+  //   slideId: string,
+  //   sessionId: string = "default"
+  // ): Promise<{ success: boolean; error?: string }> {
+  //   logger.info("Deleting Google Slide", { slideId });
+  //   return await this.deleteGoogleDriveFile(slideId, sessionId);
+  // }
 }
 
 export const googleAPIService = new GoogleAPIService();

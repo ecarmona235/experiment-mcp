@@ -77,9 +77,9 @@ const handler = createMcpHandler(server => {
   registerTools(gmailTools, "Gmail");
   registerTools(calendarTools, "Calendar");
   registerTools(driveTools, "Drive");
-  // registerTools(docsTools, "Docs");
-  // registerTools(sheetsTools, "Sheets");
-  // registerTools(slidesTools, "Slides");
+  registerTools(docsTools, "Docs");
+  registerTools(sheetsTools, "Sheets");
+  registerTools(slidesTools, "Slides");
 });
 
 logger.info("Google Workspace MCP handler created successfully", {
