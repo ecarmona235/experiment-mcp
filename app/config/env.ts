@@ -7,7 +7,7 @@ const logger = new Logger("Config:Env");
 
 // Schema for environment variables
 const envSchema = z.object({
-  REDIS_URL: z.string(),
+  REDIS_URL: z.string().optional(), // Optional for Vercel Redis
   GOOGLE_API_KEY: z.string(),
   GOOGLE_CLIENT_ID: z.string(), // used for google auth
   GOOGLE_CLIENT_SECRET: z.string(),

@@ -1,66 +1,56 @@
-import { createClient } from "redis";
+import { kv } from '@vercel/kv';
 import { env } from "@/app/config/env";
 import { Logger } from "./logger";
 
 const logger = new Logger("Redis");
 
-let redisClient: ReturnType<typeof createClient> | null = null;
-
-export async function getRedisClient() {
-  if (!redisClient) {
-    logger.info("Creating new Redis client connection");
-    redisClient = createClient({
-      url: env.REDIS_URL,
-    });
-
-    try {
-      await redisClient.connect();
-      logger.info("Redis client connected successfully");
-    } catch (error) {
-      logger.error("Failed to connect to Redis", error);
-      throw error;
-    }
-  }
-
-  return redisClient;
-}
-
 export async function storeTokens(userId: string, tokens: any) {
   try {
-    const client = await getRedisClient();
     const key = `oauth_tokens:${userId}`;
 
-    logger.info("Storing OAuth tokens in Redis", { userId, key });
+    logger.info("Storing OAuth tokens in Vercel Redis", { userId, key });
 
-    // Store tokens with expiration (e.g., 1 hour for access token)
-    await client.setEx(key, 60 * 60 * 24 * 30, JSON.stringify(tokens));
+    // Store tokens with expiration (30 days)
+    await kv.setex(key, 60 * 60 * 24 * 30, JSON.stringify(tokens));
 
     logger.info("OAuth tokens stored successfully", { userId, key });
     return key;
   } catch (error) {
-    logger.error("Failed to store tokens in Redis", error, { userId });
+    logger.error("Failed to store tokens in Vercel Redis", error, { userId });
     throw error;
   }
 }
 
 export async function getTokens(userId: string) {
   try {
-    const client = await getRedisClient();
     const key = `oauth_tokens:${userId}`;
 
-    logger.info("Retrieving OAuth tokens from Redis", { userId, key });
+    logger.info("Retrieving OAuth tokens from Vercel Redis", { userId, key });
 
-    const tokens = await client.get(key);
+    const tokens = await kv.get(key);
 
     if (tokens) {
       logger.info("OAuth tokens retrieved successfully");
-      return JSON.parse(tokens);
+      return JSON.parse(tokens as string);
     } else {
       logger.warn("No OAuth tokens found for user", { userId });
       return null;
     }
   } catch (error) {
-    logger.error("Failed to retrieve tokens from Redis", error, { userId });
+    logger.error("Failed to retrieve tokens from Vercel Redis", error, { userId });
     throw error;
+  }
+}
+
+// Helper function to test Redis connection
+export async function testRedisConnection() {
+  try {
+    await kv.set('test', 'Hello Vercel Redis!');
+    const result = await kv.get('test');
+    logger.info("Vercel Redis connection test successful", { result });
+    return true;
+  } catch (error) {
+    logger.error("Vercel Redis connection test failed", error);
+    return false;
   }
 }
