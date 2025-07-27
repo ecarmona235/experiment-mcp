@@ -1,13 +1,10 @@
 {
   "functions": {
     "app/[transport]/route.ts": {
-      "maxDuration": 30
     },
     "app/api/auth/login/route.ts": {
-      "maxDuration": 30
     },
     "app/api/auth/callback/route.ts": {
-      "maxDuration": 30
     }
   }
 } 
