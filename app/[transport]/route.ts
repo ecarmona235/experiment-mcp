@@ -12,7 +12,7 @@ import {
   slidesTools,
 } from "@/app/tools";
 
-export const maxDuration = 800;
+export const maxDuration = 120;
 
 const logger = new Logger("Google Workspace MCP");
 
