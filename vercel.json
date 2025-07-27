@@ -9,11 +9,5 @@
     "app/api/auth/callback/route.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "GOOGLE_API_KEY": "@GOOGLE_API_KEY",
-    "GOOGLE_CLIENT_ID": "@GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET": "@GOOGLE_CLIENT_SECRET",
-    "GOOGLE_SCOPES": "@GOOGLE_SCOPES"
   }
 } 
