@@ -11,11 +11,11 @@
     }
   },
   "env": {
-    "GOOGLE_API_KEY": "@google-api-key",
-    "GOOGLE_CLIENT_ID": "@google-client-id",
-    "GOOGLE_CLIENT_SECRET": "@google-client-secret",
-    "GOOGLE_REDIRECT_URI": "@google-redirect-uri",
-    "GOOGLE_MCP_SESSION_ID": "@google-mcp-session-id",
-    "GOOGLE_SCOPES": "@google-scopes"
+    "GOOGLE_API_KEY": "@gGOOGLE_API_KEY",
+    "GOOGLE_CLIENT_ID": "@GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET": "@GOOGLE_CLIENT_SECRET",
+    "GOOGLE_REDIRECT_URI": "@GOOGLE_REDIRECT_URI",
+    "GOOGLE_MCP_SESSION_ID": "@GOOGLE_MCP_SESSION_ID",
+    "GOOGLE_SCOPES": "@GOOGLE_SCOPES"
   }
 } 
