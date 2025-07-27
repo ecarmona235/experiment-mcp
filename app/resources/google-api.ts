@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { Logger } from "@/app/utils/logger";
-import { getRedisClient } from "@/app/utils/redis";
+import { getTokens } from "@/app/utils/redis";
 import { env } from "@/app/config/env";
 import * as fs from "fs";
 import mimeLookup from "mime";
@@ -105,16 +105,14 @@ export class GoogleAPIService {
       if (sessionId === "default") {
         sessionId = env.GOOGLE_MCP_SESSION_ID;
       }
-      const redis = await getRedisClient();
-      const tokensJson = await redis.get(`oauth_tokens:${sessionId}`);
+      const tokens = await getTokens(sessionId);
 
-      if (!tokensJson) {
+      if (!tokens) {
         logger.error("No authentication tokens found");
         throw new Error(
           "No authentication tokens found. Please authenticate first."
         );
       }
-      const tokens: GoogleTokens = JSON.parse(tokensJson);
 
       logger.info(
         "Tokens retrieved from Redis",
